@@ -8,19 +8,26 @@
     <title>Sign Up</title>
 </head>
 <body>
+    {% if messages %}
+        <ul style="color: green;">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    
     <form action="" method="post">
         {% csrf_token %}
         <h2>SIGNUP</h2> 
-        <input type="text" name="username" id="" placeholder="Username">
+        <input type="text" name="username" placeholder="Username">
         <input type="email" name="email" placeholder="Email">
-        <input type="password" name="password" id="" placeholder="Password">
-        <input type="password" name="confpassword" id="" placeholder="Confirm Password">
+        <input type="password" name="password" placeholder="Password">
+        <input type="password" name="confpassword" placeholder="Confirm Password">
         <input type="submit" value="Submit">
         <div class="login-link">
-            
             <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
         </div>
     </form>
-    
 </body>
+
 </html>

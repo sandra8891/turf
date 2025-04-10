@@ -12,6 +12,8 @@ urlpatterns = [
     path('verifyotp',views.verifyotp,name='verifyotp'),
     path('passwordreset',views.passwordreset,name='passwordreset'),
     path('',views.index,name="index"), 
+    path('logout', views.logoutuser, name="logoutuser"),
+
     
     
 ]

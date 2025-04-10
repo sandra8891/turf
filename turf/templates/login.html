@@ -8,6 +8,11 @@
     <title>Login</title>
 </head>
 <body>
+    {% if messages %}
+    {% for message in messages %}
+        <p style="color: green;">{{ message }}</p>
+    {% endfor %}
+{% endif %}
     <div>
         <h1>Login</h1>
 
