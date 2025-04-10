@@ -66,7 +66,7 @@ def index(request):
 def logoutuser(request):
     logout(request)
     request.session.flush()
-    return redirect('login_view')
+    return redirect('index')
 
 def logoutadmin(request):
     logout(request)
@@ -89,71 +89,67 @@ def getusername(request):
 
 
 def verifyotp(request):
-    if request.method == 'POST':
-        otp_entered = request.POST.get('otp')
-        actual_otp = request.session.get('otp')
-        otp_time = request.session.get('otp_time')
+    if request.POST:
+        otp = request.POST.get('otp')
+        otp1 = request.session.get('otp')
+        otp_time_str = request.session.get('otp_time') 
 
-        if not actual_otp or not otp_time:
-            messages.error(request, "OTP session expired. Please try again.")
-            return redirect('forgotpassword')
+    
+        if otp_time_str:
+            otp_time = datetime.fromisoformat(otp_time_str)
+            otp_expiry_time = otp_time + timedelta(minutes=5)
+            if datetime.now() > otp_expiry_time:
+                messages.error(request, 'OTP has expired. Please request a new one.')
+                del request.session['otp']
+                del request.session['otp_time']
+                return redirect('verifyotp')
 
-        # Check if OTP has expired (5 minutes)
-        if datetime.now() > datetime.strptime(otp_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=5):
-            messages.error(request, "OTP expired. Please try again.")
-            return redirect('forgotpassword')
-
-        if otp_entered == str(actual_otp):
-            messages.success(request, "OTP verified. You can now reset your password.")
+        if otp == otp1:
+            del request.session['otp']
+            del request.session['otp_time']
             return redirect('passwordreset')
         else:
-            messages.error(request, "Invalid OTP. Please try again.")
+            messages.error(request, 'Invalid OTP. Please try again.')
 
-    else:
-        # Generate and send OTP
-        otp = random.randint(100000, 999999)
-        email = request.session.get('email')
-        if email:
-            request.session['otp'] = otp
-            request.session['otp_time'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            send_mail(
-                'Your OTP Code',
-                f'Your OTP code is {otp}',
-                settings.EMAIL_HOST_USER,
-                [email],
-                fail_silently=False,
-            )
-        else:
-            messages.error(request, "Session expired or email missing. Please try again.")
-            return redirect('forgotpassword')
+    
+    otp = ''.join(random.choices('123456789', k=6))
+    request.session['otp'] = otp
+    request.session['otp_time'] = datetime.now().isoformat()
+    message = f'Your email verification code is: {otp}'
+    email_from = settings.EMAIL_HOST_USER
+    recipient_list = [request.session.get('email')]
+    send_mail('Email Verification', message, email_from, recipient_list)
 
-    return render(request, 'verifyotp.html')
-
+    return render(request, "otp.html")
 
 
 
 def passwordreset(request):
     if request.method == 'POST':
         password = request.POST.get('password')
-        confpassword = request.POST.get('confpassword')
+        confirmpassword = request.POST.get('confpassword')
 
-        if password != confpassword:
+    
+        if confirmpassword != password:
             messages.error(request, "Passwords do not match.")
-            return redirect('passwordreset')
+        else:
+            email = request.session.get('email')
+            try:
+                user = User.objects.get(email=email)
 
-        email = request.session.get('email')
-        if not email:
-            messages.error(request, "Session expired or email not found.")
-            return redirect('forgotpassword')
+                user.set_password(password)
+                user.save()
 
-        try:
-            user = User.objects.get(email=email)
-            user.set_password(password)
-            user.save()
-            messages.success(request, "Password reset successful. You can now log in.")
-            return redirect('login_view')
-        except User.DoesNotExist:
-            messages.error(request, "User not found.")
-            return redirect('forgotpassword')
+                del request.session['email']
+                messages.success(request, "Your password has been reset successfully.")
+                
+                user = authenticate(username=user.username, password=password)
+                if user is not None:
+                    login(request, user)
 
-    return render(request, 'passwordreset.html')
+                return redirect('loginuser')
+            except User.DoesNotExist:
+                messages.error(request, "No user found with that email address.")
+                return redirect('getusername')
+
+    return render(request, "passwordreset.html")
