@@ -61,8 +61,11 @@ def adminindex(request):
     return render(request, 'adminindex.html')
 
 def index(request): 
+    if request.user.is_authenticated:
+        return render(request, "home.html")
     return render(request, "index.html")
 
+ 
 def logoutuser(request):
     logout(request)
     request.session.flush()
