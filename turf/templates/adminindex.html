@@ -3,14 +3,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
     <link rel="stylesheet" href="{% static 'css/index.css' %}">
-    <title>index</title>
 </head>
 <body>
 
-    <h1>hello</h1>
+    <h1>Hello Admin</h1>
     <a href="{% url 'adminlogout' %}"><button>Logout</button></a>
+    <a href="{% url 'adminupload' %}"><button>Upload Turf</button></a>
 
 </body>
 </html>

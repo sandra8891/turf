@@ -15,6 +15,7 @@
             <img src="{% static 'images/logo.png' %}" alt="PlaySpots Logo" class="logo">
             <a href="#" class="book-button">Book Your Spot</a>
             <i class="bi bi-list menu-icon"></i>
+            <a href="{% url 'logoutuser' %}">LOGOUT</a>
         </nav>
     </header>
 
@@ -40,6 +41,23 @@
             With a rich history and diverse culture, Kochi offers a unique blend of tradition and modernity. 
             The city is known for its love for sports, especially football, and boasts a strong football culture.
         </p>
+    </section>
+
+    <section class="section">
+        <h2>Available Turfs</h2>
+        <div class="turf-grid">
+            {% for turf in turfs %}
+                <div class="turf-card">
+                    <h3>{{ turf.name }}</h3>
+                    <p>Location: {{ turf.location }}</p>
+                    <p>Sport: {{ turf.sport_types }}</p>
+                    <p>Time: {{ turf.open_time|time:"h:i A" }} - {{ turf.close_time|time:"h:i A" }}</p>
+                    <a href="{% url 'turf_detail' turf.id %}">
+                    <img src="{{ turf.images.url }}" alt="{{ turf.name }}" width="200">
+                    </a>    
+                </div>
+            {% endfor %}
+        </div>
     </section>
 </body>
 </html>

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -7,6 +7,10 @@ from django.conf import settings
 import random
 from datetime import datetime, timedelta
 from .models import *
+from .models import Turf, Slot, Booking
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.utils import timezone
+
 
 def signup(request):
     if request.POST:
@@ -45,14 +49,17 @@ def login_view(request):
             login(request, user)
             request.session['username'] = username
             messages.success(request, "User logged in successfully!")
+            
+            # Redirect to 'adminindex' if the user is an admin, otherwise redirect to 'index'
             if user.is_superuser:
-                return redirect('adminindex')
+                return redirect('adminindex')  # Redirect to admin index page
             else:
-                return redirect('index')
+                return redirect('index')  # Redirect to normal user index page
         else:
             messages.error(request, "Invalid credentials.")
     
     return render(request, 'login.html')
+
 
 def adminindex(request):
     if not request.user.is_authenticated:
@@ -60,10 +67,10 @@ def adminindex(request):
         return redirect('login_view')
     return render(request, 'adminindex.html')
 
-def index(request): 
-    if request.user.is_authenticated:
-        return render(request, "home.html")
-    return render(request, "index.html")
+# def index(request): 
+#     if request.user.is_authenticated:
+#         return render(request, "home.html")
+#     return render(request, "index.html")
 
  
 def logoutuser(request):
@@ -156,3 +163,118 @@ def passwordreset(request):
                 return redirect('getusername')
 
     return render(request, "passwordreset.html")
+
+
+def index(request): 
+    if request.user.is_authenticated:
+        return render(request, "home.html")
+    return render(request, "index.html")
+
+
+
+
+
+################################
+
+
+
+
+def is_admin(user):
+    return user.is_superuser
+
+@user_passes_test(is_admin)
+def admin_index(request):
+    turfs = Turf.objects.all()
+    return render(request, 'adminindex.html', {'turfs': turfs})
+
+
+
+
+
+def admin_upload(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        location = request.POST.get('location')
+        sport_type = request.POST.get('sport_type')
+        open_time = request.POST.get('open_time')
+        close_time = request.POST.get('close_time')
+        image = request.FILES.get('image')
+
+        # Convert open_time and close_time from 12-hour format (if provided) to 24-hour format
+        try:
+            open_time_24hr = datetime.strptime(open_time, "%I:%M %p").strftime("%H:%M")
+            close_time_24hr = datetime.strptime(close_time, "%I:%M %p").strftime("%H:%M")
+        except ValueError:
+            # Handle invalid time format (e.g., if the input doesn't match expected format)
+            messages.error(request, "Invalid time format. Please use HH:MM AM/PM.")
+            return redirect('adminupload')
+
+        # Create the Turf object with the 24-hour format times
+        Turf.objects.create(
+            name=name,
+            location=location,
+            sport_types=sport_type,
+            open_time=open_time_24hr,  # Save as 24-hour format
+            close_time=close_time_24hr,  # Save as 24-hour format
+            images=image
+        )
+        messages.success(request, "Turf uploaded successfully.")
+        return redirect('home')
+
+    return render(request, 'adminupload.html')
+
+
+
+    return render(request, 'adminupload.html')
+def home(request):
+    turfs = Turf.objects.all()
+    return render(request, 'home.html', {'turfs': turfs})
+
+
+
+
+
+
+def turf_detail(request, turf_id):
+    turf = get_object_or_404(Turf, pk=turf_id)
+    
+    # Get all slots for the turf for the next 2 weeks
+    current_date = timezone.now().date()
+    end_date = current_date + timezone.timedelta(weeks=2)
+    slots = Slot.objects.filter(turf=turf, date__range=[current_date, end_date]).order_by('date', 'start_time')
+
+    # Check if a slot is already booked
+    booked_slots = Booking.objects.filter(slot__in=slots).values_list('slot', flat=True)
+    available_slots = [slot for slot in slots if slot.id not in booked_slots]
+
+    context = {
+        'turf': turf,
+        'available_slots': available_slots,
+    }
+    
+    return render(request, 'turf_detail.html', context)
+
+
+
+
+
+
+
+
+def book_slot(request, slot_id):
+    slot = get_object_or_404(Slot, pk=slot_id)
+    
+    # Check if the slot is already booked
+    if slot.is_booked:
+        return redirect('turf_detail', turf_id=slot.turf.id)
+
+    # Create a booking if the slot is available
+    if request.user.is_authenticated:
+        Booking.objects.create(user=request.user, slot=slot, sport=slot.turf.sport_types, players=6)
+        slot.is_booked = True  # Mark slot as booked
+        slot.save()
+
+        # Redirect back to turf details page
+        return redirect('turf_detail', turf_id=slot.turf.id)
+    else:
+        return redirect('login')  # Redirect to login if the user is not logged in

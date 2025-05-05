@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Turf</title>
+    <link rel="stylesheet" href="{% static 'css/form.css' %}">
+</head>
+<body>
+    <h2>Upload Turf</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <label>Name:</label>
+        <input type="text" name="name" required><br>
+
+        <label>Location:</label>
+        <input type="text" name="location" required><br>
+
+        <label>Sport Type:</label>
+        <select name="sport_type" required>
+            <option value="Football">Football</option>
+            <option value="Cricket">Cricket</option>
+        </select><br>
+        
+        <label>Open Time:</label>
+        <input type="text" name="open_time" placeholder="06:00 AM" required><br>
+        
+        <label>Close Time:</label>
+        <input type="text" name="close_time" placeholder="06:00 PM" required><br>
+        
+        
+        <label>Image:</label>
+        <input type="file" name="image" required><br>
+        
+        <button type="submit">Upload</button>
+    </form>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ turf.name }} - Details</title>
+    <link rel="stylesheet" href="{% static 'css/form.css' %}">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <a href="{% url 'home' %}">Back to Home</a>
+        </nav>
+    </header>
+
+    <h1>{{ turf.name }}</h1>
+    <p>Location: {{ turf.location }}</p>
+    <p>Sport Type: {{ turf.sport_types }}</p>
+    <p>Open Time: {{ turf.open_time|time:"h:i A" }} - Close Time: {{ turf.close_time|time:"h:i A" }}</p>
+    <img src="{{ turf.images.url }}" alt="{{ turf.name }}" width="400">
+
+    <h2>Available Slots for Booking</h2>
+    <div class="slot-grid">
+        {% for slot in available_slots %}
+            <div class="slot-card">
+                <p>{{ slot.date }} - {{ slot.start_time|time:"h:i A" }} to {{ slot.end_time|time:"h:i A" }}</p>
+                {% if slot.is_booked %}
+                    <p style="color: red;">Booked</p>
+                {% else %}
+                    <form method="POST" action="{% url 'book_slot' slot.id %}">
+                        {% csrf_token %}
+                        <button type="submit">Book This Slot</button>
+                    </form>
+                {% endif %}
+            </div>
+        {% empty %}
+            <p>No available slots for the next 2 weeks.</p>
+        {% endfor %}
+    </div>
+</body>
+</html>
