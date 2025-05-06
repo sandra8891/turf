@@ -1,0 +1,75 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book a Slot - {{ turf.name }}</title>
+    <link rel="stylesheet" href="{% static 'css/form.css' %}">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <a href="{% url 'turf_detail' turf.id %}">Back to {{ turf.name }} Details</a>
+        </nav>
+    </header>
+
+    <div class="turf-info">
+        <h1>{{ turf.name }}</h1>
+        <p><span class="icon location-icon"></span> {{ turf.location }}</p>
+        <p><span class="icon time-icon"></span> {{ turf.open_time|time:"h:i A" }} to {{ turf.close_time|time:"h:i A" }}</p>
+    </div>
+
+    <div class="date-selector">
+        <button class="arrow left-arrow" {% if selected_date == first_date %}disabled{% endif %}><</button>
+        {% for date in dates %}
+            <div class="date-box {% if date.date == selected_date %}selected{% endif %}">
+                <p>{{ date.month }} {{ date.day }}</p>
+                <p>{{ date.weekday }}</p>
+                <input type="hidden" name="selected_date" value="{{ date.date|date:'Y-m-d' }}">
+            </div>
+        {% endfor %}
+        <button class="arrow right-arrow" {% if selected_date == last_date %}disabled{% endif %}>></button>
+    </div>
+
+    <div class="sport-info">
+        <button class="sport-button">{{ turf.sport_types }}</button>
+        <p>5's Soapy Football</p>
+    </div>
+
+    <h2>Available Slots on {{ selected_date|date:"F d, Y" }}</h2>
+    <div class="slot-grid">
+        {% for slot in available_slots %}
+            <form method="POST" action="{% url 'book_slot' slot.id %}">
+                {% csrf_token %}
+                <button type="submit" class="slot-button {% if slot.is_booked %}booked{% endif %}" {% if slot.is_booked %}disabled{% endif %}>
+                    {{ slot.start_time|time:"h:i A" }} - {{ slot.end_time|time:"h:i A" }}
+                </button>
+            </form>
+        {% empty %}
+            <p>No available slots for this date.</p>
+        {% endfor %}
+    </div>
+
+    <script>
+        document.querySelectorAll('.date-box').forEach(box => {
+            box.addEventListener('click', function() {
+                const selectedDate = this.querySelector('input[name="selected_date"]').value;
+                window.location.href = "{% url 'booking' turf.id %}?date=" + selectedDate;
+            });
+        });
+
+        const leftArrow = document.querySelector('.left-arrow');
+        const rightArrow = document.querySelector('.right-arrow');
+        leftArrow.addEventListener('click', function() {
+            if (!this.disabled) {
+                window.location.href = "{% url 'booking' turf.id %}?date={{ prev_date|date:'Y-m-d' }}";
+            }
+        });
+        rightArrow.addEventListener('click', function() {
+            if (!this.disabled) {
+                window.location.href = "{% url 'booking' turf.id %}?date={{ next_date|date:'Y-m-d' }}";
+            }
+        });
+    </script>
+</body>
+</html>

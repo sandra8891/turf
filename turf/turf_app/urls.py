@@ -18,7 +18,8 @@ urlpatterns = [
     path('home', views.home, name='home'),
     path('adminindex/', views.admin_index, name='adminindex'),
     path('adminupload/', views.admin_upload, name='adminupload'),
-    path('turf/<int:turf_id>/', views.turf_detail, name='turf_detail'),
+     path('turf/<int:turf_id>/', views.turf_detail, name='turf_detail'),
+    path('booking/<int:turf_id>/', views.booking, name='booking'),
     path('book_slot/<int:slot_id>/', views.book_slot, name='book_slot'),
     
 ]
