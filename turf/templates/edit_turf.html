@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Turf</title>
+    <link rel="stylesheet" href="{% static 'css/form.css' %}">
+</head>
+<body>
+    <h2>Edit Turf</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label>Name:</label>
+        <input type="text" name="name" value="{{ turf.name }}" required><br>
+
+        <label>Location:</label>
+        <input type="text" name="location" value="{{ turf.location }}" required><br>
+
+        <label>Sport Type:</label>
+        <select name="sport_type" required>
+            <option value="Football" {% if turf.sport_types == 'Football' %}selected{% endif %}>Football</option>
+            <option value="Cricket" {% if turf.sport_types == 'Cricket' %}selected{% endif %}>Cricket</option>
+        </select><br>
+
+        <label>Open Time:</label>
+        <input type="text" name="open_time" value="{{ turf.open_time|time:'h:i A' }}" required><br>
+
+        <label>Close Time:</label>
+        <input type="text" name="close_time" value="{{ turf.close_time|time:'h:i A' }}" required><br>
+
+        <label>Image:</label>
+        <input type="file" name="image"><br>
+        {% if turf.images %}
+            <img src="{{ turf.images.url }}" alt="Current Image" width="100">
+        {% endif %}
+
+        <button type="submit">Update</button>
+    </form>
+</body>
+</html>

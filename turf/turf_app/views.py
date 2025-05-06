@@ -49,7 +49,7 @@ def login_view(request):
             messages.success(request, "User logged in successfully!")
             
             if user.is_superuser:
-                return redirect('adminindex')
+                return redirect('admin_index')
             else:
                 return redirect('index')
         else:
@@ -57,11 +57,11 @@ def login_view(request):
     
     return render(request, 'login.html')
 
-def adminindex(request):
-    if not request.user.is_authenticated:
-        messages.error(request, "You need to be logged in to access this page.")
-        return redirect('login_view')
-    return render(request, 'adminindex.html')
+# def adminindex(request):
+#     if not request.user.is_authenticated:
+#         messages.error(request, "You need to be logged in to access this page.")
+#         return redirect('login_view')
+#     return render(request, 'adminindex.html')
 
 def logoutuser(request):
     logout(request)
@@ -147,17 +147,25 @@ def passwordreset(request):
 
 def index(request): 
     if request.user.is_authenticated:
-        return render(request, "home.html")
+        turfs = Turf.objects.all()
+        return render(request, "home.html", {'turfs': turfs})
     return render(request, "index.html")
+
 
 def is_admin(user):
     return user.is_superuser
 
-@user_passes_test(is_admin)
 def admin_index(request):
-    turfs = Turf.objects.all()
-    return render(request, 'adminindex.html', {'turfs': turfs})
+    # Get the recent bookings and turfs
+    bookings = Booking.objects.select_related('slot').order_by('-slot__date')[:5]  # Sort by Slot's date field
+    turfs = Turf.objects.all()  # Get all turfs
 
+    context = {
+        'bookings': bookings,
+        'turfs': turfs,
+    }
+
+    return render(request, 'adminindex.html', context)
 def admin_upload(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -183,7 +191,7 @@ def admin_upload(request):
             images=image
         )
         messages.success(request, "Turf uploaded successfully.")
-        return redirect('home')
+        return redirect('admin_index')  # Redirect to admin_index page after upload
 
     return render(request, 'adminupload.html')
 
@@ -294,3 +302,86 @@ def book_slot(request, slot_id):
         return redirect('turf_detail', turf_id=slot.turf.id)
     else:
         return redirect('login')
+    
+    
+@login_required
+def booking_details(request, slot_id):
+    # Fetch the slot object by its ID
+    slot = get_object_or_404(Slot, pk=slot_id)
+
+    # Redirect if slot is already booked
+    if slot.is_booked:
+        return redirect('turf_detail', turf_id=slot.turf.id)
+
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        phone_number = request.POST.get('phone_number')
+
+        if not username or not phone_number:
+            messages.error(request, 'Please provide both your name and phone number.')
+            return render(request, 'booking_details.html', {'slot': slot})
+
+        # Create a booking and mark the slot as booked
+        booking = Booking.objects.create(
+            user=request.user,
+            slot=slot,
+            address=username,  # storing username in address field
+            phone_number=phone_number,
+            sport=slot.turf.sport_types,
+            players=6
+        )
+
+        slot.is_booked = True
+        slot.save()
+
+        return redirect('payment', booking_id=booking.id)
+
+    return render(request, 'booking_details.html', {'slot': slot})
+
+
+
+
+
+
+
+def recent_bookings(request):
+    bookings = Booking.objects.select_related('slot').order_by('-slot__date')[:10]
+
+    return render(request, 'recent_bookings.html', {'bookings': bookings})
+
+
+
+
+def edit_turf(request, turf_id):
+    turf = get_object_or_404(Turf, id=turf_id)
+
+    if request.method == 'POST':
+        turf.name = request.POST.get('name')
+        turf.location = request.POST.get('location')
+        turf.sport_types = request.POST.get('sport_type')
+        open_time = request.POST.get('open_time')
+        close_time = request.POST.get('close_time')
+
+        try:
+            turf.open_time = datetime.strptime(open_time, "%I:%M %p").strftime("%H:%M")
+            turf.close_time = datetime.strptime(close_time, "%I:%M %p").strftime("%H:%M")
+        except ValueError:
+            messages.error(request, "Invalid time format.")
+            return redirect('edit_turf', turf_id=turf.id)
+
+        if request.FILES.get('image'):
+            turf.images = request.FILES['image']
+
+        turf.save()
+        messages.success(request, "Turf updated successfully.")
+        return redirect('admin_index')
+
+    return render(request, 'edit_turf.html', {'turf': turf})
+
+
+@user_passes_test(is_admin)
+def delete_turf(request, turf_id):
+    turf = get_object_or_404(Turf, id=turf_id)
+    turf.delete()
+    messages.success(request, "Turf deleted successfully.")
+    return redirect('admin_index')

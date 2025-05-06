@@ -39,12 +39,11 @@
     <h2>Available Slots on {{ selected_date|date:"F d, Y" }}</h2>
     <div class="slot-grid">
         {% for slot in available_slots %}
-            <form method="POST" action="{% url 'book_slot' slot.id %}">
-                {% csrf_token %}
-                <button type="submit" class="slot-button {% if slot.is_booked %}booked{% endif %}" {% if slot.is_booked %}disabled{% endif %}>
-                    {{ slot.start_time|time:"h:i A" }} - {{ slot.end_time|time:"h:i A" }}
-                </button>
-            </form>
+        <form method="GET" action="{% url 'booking_details' slot.id %}">
+            <button type="submit" class="slot-button {% if slot.is_booked %}booked{% endif %}" {% if slot.is_booked %}disabled{% endif %}>
+                {{ slot.start_time|time:"h:i A" }} - {{ slot.end_time|time:"h:i A" }}
+            </button>
+        </form>
         {% empty %}
             <p>No available slots for this date.</p>
         {% endfor %}

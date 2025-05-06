@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Booking Details - {{ slot.start_time|time:"h:i A" }} to {{ slot.end_time|time:"h:i A" }}</title>
+    <link rel="stylesheet" href="{% static 'css/form.css' %}">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <a href="{% url 'turf_detail' slot.turf.id %}">Back to {{ slot.turf.name }} Details</a>
+        </nav>
+    </header>
+
+    <div class="booking-info">
+        <h2>Book Slot from {{ slot.start_time|time:"h:i A" }} to {{ slot.end_time|time:"h:i A" }}</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <label for="username">Your Name:</label>
+            <input type="text" id="username" name="username" value="{{ request.user.username }}" required readonly>
+
+            <label for="phone_number">Phone Number:</label>
+            <input type="text" id="phone_number" name="phone_number" required>
+
+            <button type="submit">Proceed to Payment</button>
+        </form>
+    </div>
+</body>
+</html>
