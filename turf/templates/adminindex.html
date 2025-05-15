@@ -3,51 +3,126 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="{% static 'css/form.css' %}">
+    <title>Admin Dashboard - PlaySpots</title>
+    <link rel="stylesheet" href="{% static 'css/adminindex.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
-    <h1>Welcome Admin</h1>
-    
-    <a href="{% url 'adminlogout' %}"><button>Logout</button></a>
-    <a href="{% url 'adminupload' %}"><button>Upload Turf</button></a>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="{% static 'images/logo.png' %}" alt="PlaySpots Logo" class="sidebar-logo">
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="{% url 'admin_index' %}" class="active">
+                            <i class="bi bi-house-door"></i> Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'adminupload' %}">
+                            <i class="bi bi-upload"></i> Upload Turf
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'recent_bookings' %}">
+                            <i class="bi bi-clock-history"></i> Recent Bookings
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'adminlogout' %}">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
 
-    <h2>Uploaded Turfs</h2>
-    <table border="1">
-        <tr>
-            <th>Name</th>
-            <th>Location</th>
-            <th>Sport Type</th>
-            <th>Open Time</th>
-            <th>Close Time</th>
-            <th>Image</th> <!-- New column for Image -->
-            <th>Actions</th> <!-- Column for Edit/Delete buttons -->
-        </tr>
-        {% for turf in turfs %}
-        <tr>
-            <td>{{ turf.name }}</td>
-            <td>{{ turf.location }}</td>
-            <td>{{ turf.sport_types }}</td>
-            <td>{{ turf.open_time|time:"h:i A" }}</td>
-            <td>{{ turf.close_time|time:"h:i A" }}</td>
-            <td>
-                {% if turf.images %}
-                    <img src="{{ turf.images.url }}" alt="Turf Image" style="width: 100px; height: 100px;">
-                {% else %}
-                    No Image
-                {% endif %}
-            </td>
-            <td>
-                <a href="{% url 'edit_turf' turf.id %}"><button>Edit</button></a>
-                <a href="{% url 'delete_turf' turf.id %}" onclick="return confirm('Are you sure you want to delete this turf?');">
-                    <button>Delete</button>
-                </a>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <h1>Admin Dashboard</h1>
+                </div>
+                <!-- <div class="header-right"> -->
+                    <!-- <div class="search-bar">
+                        <input type="text" placeholder="Type to search...">
+                        <i class="bi bi-search"></i>
+                    </div> -->
+                    <!-- <div class="user-profile">
+                        <img src="{% static 'images/default_avatar.png' %}" alt="Admin Avatar" class="avatar">
+                        <span>Admin</span>
+                        <i class="bi bi-chevron-down"></i>
+                    </div> -->
+                <!-- </div> -->
+            </header>
 
-    <h2><a href="{% url 'recent_bookings' %}">Recent Bookings</a></h2> <!-- Link to the recent bookings page -->
+            <!-- Dashboard Content -->
+            <section class="dashboard-content">
+                <!-- Stats Cards -->
+                <div class="stats-cards">
+                    <div class="card">
+                        <h3>Total Turfs</h3>
+                        <p>{{ turfs|length }}</p>
+                        <!-- <span class="trend up">+5% <i class="bi bi-arrow-up"></i></span> -->
+                    </div>
+                    <div class="card">
+                        <h3>Total Bookings</h3>
+                        <p>{{ bookings|length }}</p>
+                        <!-- <span class="trend down">+10% <i class="bi bi-arrow-down"></i></span> -->
+                    </div>
+                    <div class="card">
+                        <h3>Active Users</h3>
+                        <p>{{ active_users }}</p>
+                        <!-- <span class="trend up">+2.5% <i class="bi bi-arrow-up"></i></span> -->
+                    </div>
+                </div>
 
+                <!-- Uploaded Turfs Table -->
+                <div class="table-section">
+                    <h2>Uploaded Turfs</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Location</th>
+                                <th>Sport Type</th>
+                                <th>Open Time</th>
+                                <th>Close Time</th>
+                                <th>Image</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for turf in turfs %}
+                            <tr>
+                                <td>{{ turf.name }}</td>
+                                <td>{{ turf.location }}</td>
+                                <td>{{ turf.sport_types }}</td>
+                                <td>{{ turf.open_time|time:"h:i A" }}</td>
+                                <td>{{ turf.close_time|time:"h:i A" }}</td>
+                                <td>
+                                    {% if turf.images %}
+                                        <img src="{{ turf.images.url }}" alt="Turf Image">
+                                    {% else %}
+                                        No Image
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'edit_turf' turf.id %}" class="btn btn-edit">Edit</a>
+                                    <a href="{% url 'delete_turf' turf.id %}" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this turf?');">Delete</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
 </body>
 </html>

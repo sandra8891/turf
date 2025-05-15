@@ -146,6 +146,7 @@ body {
 .section h2 {
     color: #079b35;
     margin-bottom: 10px;
+    text-align: center; /* Center the heading */
 }
 
 .section p {
@@ -237,22 +238,42 @@ body {
 
 /* Profile Section */
 .profile-details {
-    background: #f9f9f9;
+    background: #fff; /* White background like the appointment card */
     padding: 20px;
-    border-radius: 8px;
+    border-radius: 10px; /* Rounded corners */
     max-width: 500px;
     margin: 20px auto;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    border-left: 4px solid #007bff; /* Blue left border for emphasis, matching the header underline */
+}
+
+.profile-details h3 {
+    font-size: 1.2rem;
+    color: #007bff; /* Blue header to match the "Appointment" style */
+    margin-bottom: 15px;
+    border-bottom: 2px solid #007bff; /* Underline effect */
+    padding-bottom: 5px;
+    font-weight: 600;
 }
 
 .profile-details p {
     margin: 10px 0;
-    font-size: 16px;
+    font-size: 1rem;
+    color: #333;
+    line-height: 1.5;
 }
 
 .profile-details strong {
     font-weight: 700;
     color: #333;
+}
+
+.profile-meta {
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: #666; /* Lighter color for meta info like date */
+    border-top: 1px solid #eee;
+    padding-top: 10px;
 }
 
 .btn {
@@ -263,12 +284,12 @@ body {
     text-decoration: none;
     border-radius: 4px;
     margin-top: 20px;
+    transition: background 0.2s;
 }
 
 .btn:hover {
     background: #218838;
 }
-
 
 /* Responsive Design */
 @media (max-width: 768px) {

@@ -15,11 +15,11 @@
             <img src="{% static 'images/logo.png' %}" alt="PlaySpots Logo" class="logo">
             <div class="nav-links">
                 <a href="{% url 'home' %}">Home</a>
-                <a href="">Contact</a>
+                <!-- <a href="">Contact</a> -->
                 <div class="dropdown">
                     <a href="{% url 'profile' %}" class="dropdown-toggle">My Profile</a>
                     <div class="dropdown-menu">
-                        <a href="">Profile</a>
+                        <a href="{% url 'profile' %}">Profile</a>
                         <a href="">Booking History</a>
                         <a href="{% url 'logoutuser' %}">Logout</a>
                     </div>

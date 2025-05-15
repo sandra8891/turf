@@ -160,12 +160,17 @@ def admin_index(request):
     bookings = Booking.objects.select_related('slot').order_by('-slot__date')[:5]  # Sort by Slot's date field
     turfs = Turf.objects.all()  # Get all turfs
 
+    # Calculate active users (users who have made at least one booking)
+    active_users = User.objects.filter(booking__isnull=False).distinct().count()
+
     context = {
         'bookings': bookings,
         'turfs': turfs,
+        'active_users': active_users,  # Add active users to context
     }
 
     return render(request, 'adminindex.html', context)
+
 def admin_upload(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -356,34 +361,49 @@ def recent_bookings(request):
     return render(request, 'recent_bookings.html', {'bookings': bookings})
 
 
+def is_admin(user):
+    return user.is_superuser
 
-
+@user_passes_test(is_admin)
 def edit_turf(request, turf_id):
     turf = get_object_or_404(Turf, id=turf_id)
 
     if request.method == 'POST':
+        # Retrieve form data
         turf.name = request.POST.get('name')
         turf.location = request.POST.get('location')
         turf.sport_types = request.POST.get('sport_type')
         open_time = request.POST.get('open_time')
         close_time = request.POST.get('close_time')
 
-        try:
-            turf.open_time = datetime.strptime(open_time, "%I:%M %p").strftime("%H:%M")
-            turf.close_time = datetime.strptime(close_time, "%I:%M %p").strftime("%H:%M")
-        except ValueError:
-            messages.error(request, "Invalid time format.")
-            return redirect('edit_turf', turf_id=turf.id)
+        # Validate required fields
+        if not all([turf.name, turf.location, turf.sport_types, open_time, close_time]):
+            messages.error(request, "All fields are required.")
+            return render(request, 'edit_turf.html', {'turf': turf})
 
+        # Handle time fields
+        try:
+            # If using <input type="time">, the format is typically HH:MM (24-hour)
+            turf.open_time = datetime.strptime(open_time, "%H:%M").time()
+            turf.close_time = datetime.strptime(close_time, "%H:%M").time()
+        except ValueError:
+            messages.error(request, "Invalid time format. Please use HH:MM (e.g., 14:30).")
+            return render(request, 'edit_turf.html', {'turf': turf})
+
+        # Handle image upload
         if request.FILES.get('image'):
             turf.images = request.FILES['image']
 
-        turf.save()
-        messages.success(request, "Turf updated successfully.")
-        return redirect('admin_index')
+        # Save the updated turf
+        try:
+            turf.save()
+            messages.success(request, "Turf updated successfully.")
+            return redirect('admin_index')
+        except Exception as e:
+            messages.error(request, f"Error saving turf: {str(e)}")
+            return render(request, 'edit_turf.html', {'turf': turf})
 
     return render(request, 'edit_turf.html', {'turf': turf})
-
 
 @user_passes_test(is_admin)
 def delete_turf(request, turf_id):
