@@ -306,7 +306,6 @@ def book_slot(request, slot_id):
     
 @login_required
 def booking_details(request, slot_id):
-    # Fetch the slot object by its ID
     slot = get_object_or_404(Slot, pk=slot_id)
 
     # Redirect if slot is already booked
@@ -315,17 +314,25 @@ def booking_details(request, slot_id):
 
     if request.method == 'POST':
         username = request.POST.get('username')
+        email = request.POST.get('email')
         phone_number = request.POST.get('phone_number')
 
-        if not username or not phone_number:
-            messages.error(request, 'Please provide both your name and phone number.')
+        # Basic validation
+        if not username or not email or not phone_number:
+            messages.error(request, 'Please provide all required fields.')
+            return render(request, 'booking_details.html', {'slot': slot})
+
+        # Optional: Validate phone number format (e.g., 10 digits)
+        if not phone_number.isdigit() or len(phone_number) < 10:
+            messages.error(request, 'Please enter a valid phone number.')
             return render(request, 'booking_details.html', {'slot': slot})
 
         # Create a booking and mark the slot as booked
         booking = Booking.objects.create(
             user=request.user,
             slot=slot,
-            address=username,  # storing username in address field
+            address=username,  # Storing username in address field
+            email=email,       # Assuming Booking model has an email field
             phone_number=phone_number,
             sport=slot.turf.sport_types,
             players=6
@@ -337,7 +344,6 @@ def booking_details(request, slot_id):
         return redirect('payment', booking_id=booking.id)
 
     return render(request, 'booking_details.html', {'slot': slot})
-
 
 
 
@@ -385,3 +391,48 @@ def delete_turf(request, turf_id):
     turf.delete()
     messages.success(request, "Turf deleted successfully.")
     return redirect('admin_index')
+
+
+
+
+def list_turfs(request):
+    turfs = Turf.objects.all()
+    return render(request, 'list_turfs.html', {'turfs': turfs})
+
+
+
+
+
+from django.db.models import Q
+
+def search_turfs(request):
+    query = request.GET.get('q', '')  # Get the search query from the input field
+    turfs = Turf.objects.all()
+
+    if query:
+        # Filter turfs by name or location (case-insensitive)
+        turfs = turfs.filter(
+            Q(name__icontains=query) | Q(location__icontains=query)
+        )
+
+    context = {
+        'turfs': turfs,
+        'query': query,  # Pass the query to display in the template
+    }
+    return render(request, 'list_turfs.html', context)\
+        
+        
+        
+        
+@login_required
+def profile(request):
+    user = request.user
+    # Get the latest booking for phone number (if exists)
+    latest_booking = Booking.objects.filter(user=user).order_by('-created_at').first()
+    
+    context = {
+        'username': user.username,
+        'email': user.email,
+        'phone_number': latest_booking.phone_number if latest_booking else "Not provided",
+    }
+    return render(request, 'profile.html', context)

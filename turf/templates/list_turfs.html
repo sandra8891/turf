@@ -1,4 +1,13 @@
-body {
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Available Turfs - PlaySpots</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
@@ -86,49 +95,30 @@ body {
             color: #079b35;
         }
 
+        /* Search Bar */
         .search-container {
-    display: flex;
-    align-items: center;
-}
-.search-container form {
-    display: flex;
-    align-items: center;
-}
-.search-container input[type="text"] {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px 0 0 4px;
-    outline: none;
-}
-.search-container button {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-left: none;
-    background: #28a745;
-    color: white;
-    border-radius: 0 4px 4px 0;
-    cursor: pointer;
-}
-.search-container button:hover {
-    background: #218838;
-}
-
-        /* Hero Section */
-        .hero {
-            background-image: url('../images/bg3.jpg');
-            background-size: cover;
-            background-position: center;
-            color: white;
-            height: 700px;
             display: flex;
-            justify-content: center;
             align-items: center;
-            text-align: center;
+            position: relative;
         }
 
-        .hero h1 {
-            font-size: 2rem;
-            font-weight: 700;
+        .search-container input {
+            padding: 8px 30px 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .search-container input:focus {
+            border-color: #079b35;
+        }
+
+        .search-container .bi-search {
+            position: absolute;
+            right: 10px;
+            color: #666;
+            font-size: 1rem;
         }
 
         /* Sections */
@@ -140,27 +130,8 @@ body {
 
         .section h2 {
             color: #079b35;
-            margin-bottom: 10px;
-        }
-
-        .section p {
-            line-height: 1.6;
-            font-size: 1rem;
-        }
-
-        .section a {
-            color: #079b35;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        /* Menu Icon */
-        .menu-icon {
-            font-size: 28px;
-            color: #333;
-            cursor: pointer;
-            margin-left: 20px;
-            display: none;
+            margin-bottom: 20px;
+            text-align: center;
         }
 
         /* Turf Grid with Flexbox */
@@ -240,3 +211,52 @@ body {
                 display: block;
             }
         }
+    </style>
+</head>
+<body>
+    <!-- Navigation bar -->
+    <header>
+        <nav class="navbar">
+            <img src="{% static 'images/logo.png' %}" alt="PlaySpots Logo" class="logo">
+            <div class="nav-links">
+                <a href="{% url 'home' %}">Home</a>
+                <a href="">Contact</a>
+                <div class="dropdown">
+                    <a href="" class="dropdown-toggle">My Profile</a>
+                    <div class="dropdown-menu">
+                        <a href="">Profile</a>
+                        <a href="">Booking History</a>
+                        <a href="{% url 'logoutuser' %}">Logout</a>
+                    </div>
+                </div>
+            </div>
+            <div class="search-container">
+                <input type="text" placeholder="Search...">
+                <i class="bi bi-search"></i>
+            </div>
+            <a href="{% url 'list_turfs' %}" class="book-button">Book Your Spot</a>
+            <i class="bi bi-list menu-icon"></i>
+        </nav>
+    </header>
+
+    <!-- Content Section -->
+    <section class="section">
+        <h2>Available Turfs</h2>
+        <div class="turf-grid">
+            {% for turf in turfs %}
+                <div class="turf-card">
+                    <a href="{% url 'turf_detail' turf.id %}">
+                        <div class="turf-image">
+                            <img src="{{ turf.images.url }}" alt="{{ turf.name }}">
+                        </div>
+                    </a>
+                    <div class="turf-info">
+                        <h3>{{ turf.name }}</h3>
+                        <p>{{ turf.location }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+</body>
+</html>

@@ -26,6 +26,9 @@ urlpatterns = [
     path('admin/turf/edit/<int:turf_id>/', views.edit_turf, name='edit_turf'),
 
     path('admin/turf/delete/<int:turf_id>/', views.delete_turf, name='delete_turf'),
+    path('list-turfs/', views.list_turfs, name='list_turfs'), 
+    path('search-turfs/', views.search_turfs, name='search_turfs'),
+    path('profile/', views.profile, name='profile'),
 ]
     
 if settings.DEBUG:

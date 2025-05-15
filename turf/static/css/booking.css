@@ -1,0 +1,220 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+.navbar {
+    background: linear-gradient(90deg, #2c3e50, #34495e);
+    padding: 15px 20px;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.navbar a:hover {
+    color: #1abc9c;
+}
+
+.turf-info {
+    text-align: center;
+    margin: 80px 20px 40px;
+}
+
+.turf-info h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+
+.turf-info p {
+    font-size: 18px;
+    color: #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 5px 0;
+}
+
+.turf-info .icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    background-size: cover;
+}
+
+/* Add to existing CSS */
+.turf-image {
+    max-width: 300px;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+
+.location-icon {
+    background: url('location.png') no-repeat center; /* Replace with actual icon */
+}
+
+.time-icon {
+    background: url('time.png') no-repeat center; /* Replace with actual icon */
+}
+
+.date-selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.date-box {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.date-box.selected {
+    background: #1abc9c;
+    color: #fff;
+    border-color: #1abc9c;
+}
+
+.date-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.date-box p {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+.arrow {
+    background: #34495e;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    cursor: pointer;
+    margin: 0 10px;
+    transition: background 0.3s ease;
+}
+
+.arrow:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+}
+
+.arrow:hover:not(:disabled) {
+    background: #1abc9c;
+}
+
+.sport-info {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.sport-button {
+    background:42c9c;
+    color: #fff;
+    border: none;
+    padding: 12px 30px;
+    font-size: 18px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.sport-button:hover {
+    background: #16a085;
+}
+
+h2 {
+    text-align: center;
+    font-size: 24px;
+    color: #2c3e50;
+    margin: 20px 0;
+}
+
+.slot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.slot-button {
+    background: #ecf0f1;
+    border: none;
+    padding: 15px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.slot-button:hover:not(:disabled) {
+    background: #1abc9c;
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.slot-button.booked {
+    background: #e74c3c;
+    color: #fff;
+    cursor: not-allowed;
+}
+
+.slot-button:disabled {
+    opacity: 0.6;
+}
+
+@media (max-width: 768px) {
+    .turf-info h1 {
+        font-size: 24px;
+    }
+
+    .turf-info p {
+        font-size: 16px;
+    }
+
+    .date-selector {
+        flex-direction: column;
+    }
+
+    .date-box {
+        width: 100%;
+        max-width: 200px;
+    }
+
+    .slot-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+}

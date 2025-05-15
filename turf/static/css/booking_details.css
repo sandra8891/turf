@@ -1,0 +1,150 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+.navbar {
+    background: linear-gradient(90deg, #2c3e50, #34495e);
+    padding: 15px 20px;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.navbar a:hover {
+    color: #1abc9c;
+}
+
+.booking-info {
+    max-width: 600px;
+    margin: 100px auto 40px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.booking-info h2 {
+    font-size: 24px;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+.turf-image {
+    max-width: 300px;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.messages {
+    margin-bottom: 20px;
+}
+
+.message {
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.message.error {
+    background: #e74c3c;
+    color: #fff;
+}
+
+.message.success {
+    background: #1abc9c;
+    color: #fff;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    font-size: 16px;
+    color: #2c3e50;
+    margin-bottom: 8px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #1abc9c;
+}
+
+.form-group input[readonly] {
+    background: #ecf0f1;
+    cursor: not-allowed;
+}
+
+.submit-button {
+    background: #1abc9c;
+    color: #fff;
+    border: none;
+    padding: 12px 30px;
+    font-size: 18px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    width: 100%;
+    max-width: 300px;
+}
+
+.submit-button:hover {
+    background: #16a085;
+}
+
+@media (max-width: 768px) {
+    .booking-info {
+        margin: 80px 20px 40px;
+        padding: 15px;
+    }
+
+    .booking-info h2 {
+        font-size: 20px;
+    }
+
+    .turf-image {
+        max-width: 250px;
+    }
+
+    .form-group label {
+        font-size: 14px;
+    }
+
+    .form-group input {
+        font-size: 14px;
+    }
+
+    .submit-button {
+        font-size: 16px;
+        padding: 10px 20px;
+    }
+}

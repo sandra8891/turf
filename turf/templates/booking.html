@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Book a Slot - {{ turf.name }}</title>
-    <link rel="stylesheet" href="{% static 'css/form.css' %}">
+    <link rel="stylesheet" href="{% static 'css/booking.css' %}">
 </head>
 <body>
     <header>
@@ -14,10 +14,15 @@
     </header>
 
     <div class="turf-info">
-        <h1>{{ turf.name }}</h1>
-        <p><span class="icon location-icon"></span> {{ turf.location }}</p>
-        <p><span class="icon time-icon"></span> {{ turf.open_time|time:"h:i A" }} to {{ turf.close_time|time:"h:i A" }}</p>
-    </div>
+    {% if turf.images %}
+        <img src="{{ turf.images.url }}" alt="{{ turf.name }}" class="turf-image">
+    {% else %}
+        <p>No image available</p>
+    {% endif %}
+    <h1>{{ turf.name }}</h1>
+    <p><span class="icon location-icon"></span> {{ turf.location }}</p>
+    <p><span class="icon time-icon"></span> {{ turf.open_time|time:"h:i A" }} to {{ turf.close_time|time:"h:i A" }}</p>
+</div>
 
     <div class="date-selector">
         <button class="arrow left-arrow" {% if selected_date == first_date %}disabled{% endif %}><</button>
@@ -33,7 +38,7 @@
 
     <div class="sport-info">
         <button class="sport-button">{{ turf.sport_types }}</button>
-        <p>5's Soapy Football</p>
+    
     </div>
 
     <h2>Available Slots on {{ selected_date|date:"F d, Y" }}</h2>

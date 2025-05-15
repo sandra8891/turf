@@ -1,6 +1,7 @@
 from django.db import models
 from datetime import time
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 # Create your models here.
 class Turf(models.Model):
@@ -28,9 +29,24 @@ class Slot(models.Model):
 
 class Booking(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    slot = models.ForeignKey(Slot, on_delete=models.CASCADE)
+    slot = models.ForeignKey('Slot', on_delete=models.CASCADE)
+    address = models.CharField(max_length=255, default="Not provided")
+    email = models.EmailField(max_length=254, blank=True, null=True)
+    phone_number = models.CharField(max_length=15)
     sport = models.CharField(max_length=100)
-    players = models.IntegerField(default=6)
+    players = models.IntegerField(default=1)
+    created_at = models.DateTimeField(default=timezone.now)  # Set a default
+    
+    def __str__(self):
+        return f"Booking for {self.slot} by {self.user.username}"
+    
+    
+    
+    
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='profile_images/', null=True, blank=True)
+    phone_number = models.CharField(max_length=15, null=True, blank=True)
 
     def __str__(self):
-        return f"Booking by {self.user.username} for {self.slot}"
+        return f"{self.user.username}'s Profile"
