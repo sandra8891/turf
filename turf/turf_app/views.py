@@ -4,9 +4,13 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.core.mail import send_mail
 from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
 import random
+from django.urls import reverse
+from django.core.mail import send_mail
+import razorpay
 from datetime import datetime, timedelta, time
-from .models import Turf, Slot, Booking
+from .models import Turf, Slot, Booking,PaymentStatus
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils import timezone
 
@@ -156,19 +160,24 @@ def is_admin(user):
     return user.is_superuser
 
 def admin_index(request):
-    # Get the recent bookings and turfs
-    bookings = Booking.objects.select_related('slot').order_by('-slot__date')[:5]  # Sort by Slot's date field
-    turfs = Turf.objects.all()  # Get all turfs
-
-    # Calculate active users (users who have made at least one booking)
+    # Get recent bookings and turfs
+    bookings = Booking.objects.select_related('slot').order_by('-created_at')[:5]
+    turfs = Turf.objects.all()
+    
+    # Calculate active users
     active_users = User.objects.filter(booking__isnull=False).distinct().count()
+    
+    # Count bookings from the last 7 days
+    recent_bookings_count = Booking.objects.filter(
+        created_at__gte=timezone.now() - timedelta(days=7)
+    ).count()
 
     context = {
         'bookings': bookings,
         'turfs': turfs,
-        'active_users': active_users,  # Add active users to context
+        'active_users': active_users,
+        'recent_bookings_count': recent_bookings_count,
     }
-
     return render(request, 'adminindex.html', context)
 
 def admin_upload(request):
@@ -178,6 +187,7 @@ def admin_upload(request):
         sport_type = request.POST.get('sport_type')
         open_time = request.POST.get('open_time')
         close_time = request.POST.get('close_time')
+        price = request.POST.get('price')  # New price field
         image = request.FILES.get('image')
 
         try:
@@ -185,7 +195,16 @@ def admin_upload(request):
             close_time_24hr = datetime.strptime(close_time, "%I:%M %p").strftime("%H:%M")
         except ValueError:
             messages.error(request, "Invalid time format. Please use HH:MM AM/PM.")
-            return redirect('adminupload')
+            return redirect('admin_upload')
+
+        try:
+            price = float(price)  # Convert price to float
+            if price < 0:
+                messages.error(request, "Price cannot be negative.")
+                return redirect('admin_upload')
+        except (ValueError, TypeError):
+            messages.error(request, "Invalid price format. Please enter a valid number.")
+            return redirect('admin_upload')
 
         Turf.objects.create(
             name=name,
@@ -193,10 +212,11 @@ def admin_upload(request):
             sport_types=sport_type,
             open_time=open_time_24hr,
             close_time=close_time_24hr,
+            price=price,  # Save price
             images=image
         )
         messages.success(request, "Turf uploaded successfully.")
-        return redirect('admin_index')  # Redirect to admin_index page after upload
+        return redirect('admin_index')
 
     return render(request, 'adminupload.html')
 
@@ -315,6 +335,7 @@ def booking_details(request, slot_id):
 
     # Redirect if slot is already booked
     if slot.is_booked:
+        messages.error(request, 'This slot is already booked.')
         return redirect('turf_detail', turf_id=slot.turf.id)
 
     if request.method == 'POST':
@@ -327,39 +348,43 @@ def booking_details(request, slot_id):
             messages.error(request, 'Please provide all required fields.')
             return render(request, 'booking_details.html', {'slot': slot})
 
-        # Optional: Validate phone number format (e.g., 10 digits)
+        # Validate phone number format (e.g., 10 digits)
         if not phone_number.isdigit() or len(phone_number) < 10:
             messages.error(request, 'Please enter a valid phone number.')
             return render(request, 'booking_details.html', {'slot': slot})
 
-        # Create a booking and mark the slot as booked
+        # Create a booking (do not mark slot as booked yet)
         booking = Booking.objects.create(
             user=request.user,
             slot=slot,
             address=username,  # Storing username in address field
-            email=email,       # Assuming Booking model has an email field
+            email=email,
             phone_number=phone_number,
             sport=slot.turf.sport_types,
-            players=6
+            players=6,
+            total_amount=slot.turf.price,  # Set total_amount from turf price
+            status=PaymentStatus.PENDING  # Explicitly set status
         )
 
-        slot.is_booked = True
-        slot.save()
-
-        return redirect('payment', booking_id=booking.id)
+        return redirect('order_payment', booking_id=booking.id)
 
     return render(request, 'booking_details.html', {'slot': slot})
 
 
 
-
-
-
 def recent_bookings(request):
-    bookings = Booking.objects.select_related('slot').order_by('-slot__date')[:10]
-
-    return render(request, 'recent_bookings.html', {'bookings': bookings})
-
+    if request.user.is_superuser:
+        # Admins see all bookings with related slot and turf data
+        bookings = Booking.objects.select_related('slot__turf').order_by('-created_at')[:10]
+    else:
+        # Regular users see only their bookings
+        bookings = Booking.objects.filter(user=request.user).select_related('slot__turf').order_by('-created_at')[:10]
+    
+    context = {
+        'bookings': bookings,
+        'is_admin': request.user.is_superuser,
+    }
+    return render(request, 'recent_bookings.html', context)
 
 def is_admin(user):
     return user.is_superuser
@@ -375,19 +400,29 @@ def edit_turf(request, turf_id):
         turf.sport_types = request.POST.get('sport_type')
         open_time = request.POST.get('open_time')
         close_time = request.POST.get('close_time')
+        price = request.POST.get('price')  # New price field
 
         # Validate required fields
-        if not all([turf.name, turf.location, turf.sport_types, open_time, close_time]):
+        if not all([turf.name, turf.location, turf.sport_types, open_time, close_time, price]):
             messages.error(request, "All fields are required.")
             return render(request, 'edit_turf.html', {'turf': turf})
 
         # Handle time fields
         try:
-            # If using <input type="time">, the format is typically HH:MM (24-hour)
             turf.open_time = datetime.strptime(open_time, "%H:%M").time()
             turf.close_time = datetime.strptime(close_time, "%H:%M").time()
         except ValueError:
             messages.error(request, "Invalid time format. Please use HH:MM (e.g., 14:30).")
+            return render(request, 'edit_turf.html', {'turf': turf})
+
+        # Handle price field
+        try:
+            turf.price = float(price)
+            if turf.price < 0:
+                messages.error(request, "Price cannot be negative.")
+                return render(request, 'edit_turf.html', {'turf': turf})
+        except (ValueError, TypeError):
+            messages.error(request, "Invalid price format. Please enter a valid number.")
             return render(request, 'edit_turf.html', {'turf': turf})
 
         # Handle image upload
@@ -456,3 +491,121 @@ def profile(request):
         'phone_number': latest_booking.phone_number if latest_booking else "Not provided",
     }
     return render(request, 'profile.html', context)
+
+@login_required
+def booking_history(request):
+    # Fetch bookings for the logged-in user, ordered by most recent
+    bookings = Booking.objects.filter(user=request.user).select_related('slot').order_by('-created_at')
+    context = {
+        'bookings': bookings,
+    }
+    return render(request, 'booking_history.html', context)
+
+
+@login_required
+def order_payment(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id)
+    client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
+
+    # Create Razorpay order
+    try:
+        razorpay_order = client.order.create({
+            'amount': int(booking.total_amount * 100),  # Amount in paise
+            'currency': 'INR',
+            'payment_capture': '1'  # Auto-capture payment
+        })
+
+        # Save Razorpay order ID to booking
+        booking.provider_order_id = razorpay_order['id']
+        booking.save()
+
+        # Build callback URL
+        callback_url = request.build_absolute_uri(reverse('razorpay_callback'))
+
+        return render(request, 'payment.html', {
+            'booking': booking,
+            'razorpay_key': settings.RAZOR_KEY_ID,
+            'razorpay_order_id': razorpay_order['id'],
+            'amount': int(booking.total_amount * 100),
+            'currency': 'INR',
+            'callback_url': callback_url,
+            'name': booking.user.username,
+            'description': f'Payment for booking {booking.id}',
+            'prefill': {
+                'name': booking.user.username,
+                'email': booking.email,
+                'contact': booking.phone_number,
+            }
+        })
+    except Exception as e:
+        messages.error(request, f'Error creating payment order: {str(e)}')
+        return redirect('booking_details', slot_id=booking.slot.id)
+
+
+
+@csrf_exempt
+def razorpay_callback(request):
+    client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
+    if "razorpay_signature" in request.POST:
+        payment_id = request.POST.get('razorpay_payment_id', '')
+        provider_order_id = request.POST.get('razorpay_order_id', '')
+        signature_id = request.POST.get('razorpay_signature', '')
+        try:
+            booking = Booking.objects.get(provider_order_id=provider_order_id)
+            booking.payment_id = payment_id
+            booking.signature_id = signature_id
+            params_dict = {
+                'razorpay_order_id': provider_order_id,
+                'razorpay_payment_id': payment_id,
+                'razorpay_signature': signature_id
+            }
+            try:
+                client.utility.verify_payment_signature(params_dict)
+                booking.status = PaymentStatus.COMPLETED
+                booking.slot.is_booked = True  # Mark slot as booked
+                booking.slot.save()
+                booking.save()
+                # Send confirmation email
+                send_mail(
+                    subject='Booking Confirmation',
+                    message=(
+                        f'Dear {booking.user.username},\n\n'
+                        f'Your booking for {booking.slot.turf.name} on {booking.slot.date} '
+                        f'from {booking.slot.start_time.strftime("%I:%M %p")} to '
+                        f'{booking.slot.end_time.strftime("%I:%M %p")} has been confirmed.\n'
+                        f'Total Amount: ₹{booking.total_amount}\n\n'
+                        f'Thank you for using PlaySpots!'
+                    ),
+                    from_email=settings.EMAIL_HOST_USER,
+                    recipient_list=[booking.email],
+                    fail_silently=True,
+                )
+                messages.success(request, 'Payment successful! Your booking is confirmed.')
+                return redirect('booking_history')  # Redirect to booking_history instead
+            except razorpay.errors.SignatureVerificationError:
+                booking.status = PaymentStatus.CANCELLED
+                booking.slot.is_booked = False
+                booking.slot.save()
+                booking.save()
+                messages.error(request, 'Payment verification failed.')
+                return redirect('booking_history')
+        except Booking.DoesNotExist:
+            messages.error(request, 'Booking not found.')
+            return redirect('booking_history')
+    else:
+        # Handle failed payment
+        error_metadata = request.POST.get('error[metadata]', '{}')
+        try:
+            import json
+            error_metadata = json.loads(error_metadata)
+            provider_order_id = error_metadata.get('order_id', '')
+            booking = Booking.objects.get(provider_order_id=provider_order_id)
+            booking.status = PaymentStatus.CANCELLED
+            booking.slot.is_booked = False
+            booking.slot.save()
+            booking.save()
+            messages.error(request, 'Payment failed. Please try again.')
+            return redirect('booking_history')
+        except (Booking.DoesNotExist, ValueError):
+            messages.error(request, 'Booking not found or invalid error metadata.')
+            return redirect('booking_history')

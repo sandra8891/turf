@@ -28,6 +28,10 @@ urlpatterns = [
     path('list-turfs/', views.list_turfs, name='list_turfs'), 
     path('search-turfs/', views.search_turfs, name='search_turfs'),
     path('profile/', views.profile, name='profile'),
+    path('payment/<int:booking_id>/', views.order_payment, name='order_payment'),
+    path('payment/callback/', views.razorpay_callback, name='razorpay_callback'),
+    path('recent-bookings/', views.recent_bookings, name='recent_bookings'),
+    path('booking-history/', views.booking_history, name='booking_history'),
     
 ]
     

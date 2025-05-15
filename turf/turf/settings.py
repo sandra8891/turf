@@ -133,3 +133,7 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'sandraks8891@gmail.com'
 EMAIL_HOST_PASSWORD = 'gupz xzhw rzne ywtc'
 
+
+
+RAZOR_KEY_ID = "rzp_test_8iprxQ5RyLMRIS"
+RAZOR_KEY_SECRET = "x7ZmPvDNjTbkai389H4WPCgX"

@@ -1,0 +1,101 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment for Booking</title>
+    <link rel="stylesheet" href="{% static 'css/payment.css' %}">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <a href="{% url 'booking_details' booking.slot.id %}">Back to Booking Details</a>
+            <a href="{% url 'index' %}">Home</a>
+        </nav>
+    </header>
+
+    <div class="payment-container">
+        <h2>Complete Your Payment</h2>
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <p class="message {{ message.tags }}">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if booking %}
+            <p>Booking for <strong>{{ booking.slot.turf.name }}</strong> on <strong>{{ booking.slot.date|date:"F d, Y" }}</strong> from <strong>{{ booking.slot.start_time|time:"h:i A" }}</strong> to <strong>{{ booking.slot.end_time|time:"h:i A" }}</strong></p>
+            <p>Amount: <strong>₹{{ booking.total_amount|floatformat:2 }}</strong></p>
+
+            <div id="loading" class="loading">Loading payment gateway...</div>
+            <form method="POST" aria-label="Payment Form">
+                {% csrf_token %}
+                <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+                <script>
+                    document.getElementById('loading').style.display = 'block';
+                    var options = {
+                        key: "{{ razorpay_key|default:'MISSING_KEY' }}",
+                        amount: {{ amount|default:0 }},
+                        currency: "{{ currency|default:'INR' }}",
+                        name: "{{ name|escape }}",
+                        description: "{{ description|escape }}",
+                        image: "{% static 'images/logo.png' %}",
+                        order_id: "{{ razorpay_order_id|default:'MISSING_ORDER_ID' }}",
+                        callback_url: "{{ callback_url|default:'#' }}",
+                        redirect: true,
+                        prefill: {
+                            name: "{{ prefill.name|escape }}",
+                            email: "{{ prefill.email|escape }}",
+                            contact: "{{ prefill.contact|escape }}"
+                        },
+                        notes: {
+                            booking_id: "{{ booking.id|default:'UNKNOWN' }}"
+                        },
+                        theme: {
+                            color: "#3399cc"
+                        },
+                        handler: function (response) {
+                            console.log('Payment successful:', response);
+                            document.getElementById('loading').style.display = 'none';
+                            window.location.href = "{% url 'booking_history' %}"; // Redirect to booking history
+                        }
+                    };
+                    var rzp1 = new Razorpay(options);
+                    rzp1.on('payment.failed', function (response) {
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('error-message').style.display = 'block';
+                        document.getElementById('error-message').innerText = 'Payment failed: ' + response.error.description;
+                        setTimeout(() => {
+                            window.location.href = "{% url 'booking_history' %}";
+                        }, 2000); // Redirect after 2 seconds
+                    });
+                    rzp1.on('payment.error', function (response) {
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('error-message').style.display = 'block';
+                        document.getElementById('error-message').innerText = 'An error occurred during payment. Please try again.';
+                        setTimeout(() => {
+                            window.location.href = "{% url 'booking_history' %}";
+                        }, 2000); // Redirect after 2 seconds
+                    });
+                    rzp1.open();
+                    document.getElementById('loading').style.display = 'none';
+                </script>
+                <input type="hidden" name="hidden" aria-hidden="true">
+            </form>
+            <div id="error-message" class="error-message" style="display: none;"></div>
+        {% else %}
+            <p class="error">Booking details not found. Please try again or contact support.</p>
+        {% endif %}
+    </div>
+
+    <script>
+        // Fallback for missing logo
+        const logoImg = document.querySelector('img[src="{% static 'images/logo.png' %}"]');
+        if (logoImg && !logoImg.complete) {
+            logoImg.src = '{% static 'images/fallback_logo.png' %}';
+        }
+    </script>
+</body>
+</html>

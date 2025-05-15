@@ -4,54 +4,42 @@
 <head>
     <meta charset="UTF-8">
     <title>Edit Turf</title>
-    <link rel="stylesheet" href="{% static 'css/edit_turf.css' %}">
+    <link rel="stylesheet" href="{% static 'css/form.css' %}">
 </head>
 <body>
-    <div class="form-container">
-        <h2>Edit Turf</h2>
+    <h2>Edit Turf</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
         
-        <!-- Display messages -->
-        {% if messages %}
-            <ul class="messages">
-                {% for message in messages %}
-                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-                {% endfor %}
-            </ul>
+        <label>Name:</label>
+        <input type="text" name="name" value="{{ turf.name }}" required><br>
+
+        <label>Location:</label>
+        <input type="text" name="location" value="{{ turf.location }}" required><br>
+
+        <label>Sport Type:</label>
+        <select name="sport_type" required>
+            <option value="Football" {% if turf.sport_types == 'Football' %}selected{% endif %}>Football</option>
+            <option value="Cricket" {% if turf.sport_types == 'Cricket' %}selected{% endif %}>Cricket</option>
+        </select><br>
+        
+        <label>Open Time:</label>
+        <input type="time" name="open_time" value="{{ turf.open_time|time:'H:i' }}" required><br>
+        
+        <label>Close Time:</label>
+        <input type="time" name="close_time" value="{{ turf.close_time|time:'H:i' }}" required><br>
+        
+        <label>Price per Hour:</label>
+        <input type="number" name="price" step="0.01" min="0" value="{{ turf.price }}" required><br>
+        
+        <label>Image:</label>
+        <input type="file" name="image"><br>
+        {% if turf.images %}
+            <img src="{{ turf.images.url }}" alt="{{ turf.name }}" width="100"><br>
         {% endif %}
-
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name" value="{{ turf.name }}" required><br>
-
-            <label for="location">Location:</label>
-            <input type="text" id="location" name="location" value="{{ turf.location }}" required><br>
-
-            <label for="sport_type">Sport Type:</label>
-            <select id="sport_type" name="sport_type" required>
-                <option value="Football" {% if turf.sport_types == 'Football' %}selected{% endif %}>Football</option>
-                <option value="Cricket" {% if turf.sport_types == 'Cricket' %}selected{% endif %}>Cricket</option>
-            </select><br>
-
-            <label for="open_time">Open Time:</label>
-            <input type="time" id="open_time" name="open_time" value="{{ turf.open_time|time:'H:i' }}" required><br>
-
-            <label for="close_time">Close Time:</label>
-            <input type="time" id="close_time" name="close_time" value="{{ turf.close_time|time:'H:i' }}" required><br>
-
-            <label for="image">Image:</label>
-            <input type="file" id="image" name="image" accept="image/*"><br>
-            <div class="image-preview">
-                {% if turf.images %}
-                    <img src="{{ turf.images.url }}" alt="Current Image">
-                {% else %}
-                    <p>No image uploaded</p>
-                {% endif %}
-            </div>
-
-            <button type="submit">Update</button>
-        </form>
-        <a href="{% url 'admin_index' %}">Back to Dashboard</a>
-    </div>
+        
+        <button type="submit">Save Changes</button>
+    </form>
+    <a href="{% url 'admin_index' %}">Cancel</a>
 </body>
 </html>

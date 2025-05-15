@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Booking History</title>
+    <link rel="stylesheet" href="{% static 'css/recent_bookings.css' %}">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'profile' %}">Profile</a>
+            <a href="{% url 'logoutuser' %}">Logout</a>
+        </nav>
+    </header>
+
+    <div class="bookings-container">
+        <h2>My Booking History</h2>
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <p class="message {{ message.tags }}">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% if bookings %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Turf</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Sport</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                        <tr>
+                            <td>{{ booking.slot.turf.name }}</td>
+                            <td>{{ booking.slot.date|date:"F d, Y" }}</td>
+                            <td>{{ booking.slot.start_time|time:"h:i A" }} - {{ booking.slot.end_time|time:"h:i A" }}</td>
+                            <td>{{ booking.sport }}</td>
+                            <td>₹{{ booking.total_amount|floatformat:2 }}</td>
+                            <td>{{ booking.status }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>You have no bookings yet.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

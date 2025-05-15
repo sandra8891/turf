@@ -1,0 +1,40 @@
+/* static/css/recent_bookings.css */
+.bookings-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+}
+
+.bookings-container h2 {
+    text-align: center;
+    color: #333;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.messages {
+    margin-bottom: 20px;
+}
+
+.message.success {
+    color: green;
+}
+
+.message.error {
+    color: red;
+}
