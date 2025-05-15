@@ -118,9 +118,20 @@ body {
     background: #218838;
 }
 
+.search-container .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
 /* Hero Section */
 .hero {
-    background-image: url('../images/bg3.jpg');
+    background-image: url('/static/images/bg3.jpg');
     background-size: cover;
     background-position: center;
     color: white;
@@ -146,7 +157,7 @@ body {
 .section h2 {
     color: #079b35;
     margin-bottom: 10px;
-    text-align: center; /* Center the heading */
+    text-align: center;
 }
 
 .section p {
@@ -238,20 +249,20 @@ body {
 
 /* Profile Section */
 .profile-details {
-    background: #fff; /* White background like the appointment card */
+    background: #fff;
     padding: 20px;
-    border-radius: 10px; /* Rounded corners */
+    border-radius: 10px;
     max-width: 500px;
     margin: 20px auto;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-    border-left: 4px solid #007bff; /* Blue left border for emphasis, matching the header underline */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #007bff;
 }
 
 .profile-details h3 {
     font-size: 1.2rem;
-    color: #007bff; /* Blue header to match the "Appointment" style */
+    color: #007bff;
     margin-bottom: 15px;
-    border-bottom: 2px solid #007bff; /* Underline effect */
+    border-bottom: 2px solid #007bff;
     padding-bottom: 5px;
     font-weight: 600;
 }
@@ -271,7 +282,7 @@ body {
 .profile-meta {
     margin-top: 15px;
     font-size: 0.9rem;
-    color: #666; /* Lighter color for meta info like date */
+    color: #666;
     border-top: 1px solid #eee;
     padding-top: 10px;
 }
@@ -291,6 +302,93 @@ body {
     background: #218838;
 }
 
+/* Footer Styling */
+.footer {
+    background-color: #333;
+    color: #fff;
+    padding: 40px 20px;
+    margin-top: 40px;
+    font-family: 'Inter', sans-serif;
+    min-height: 200px;
+    display: block;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.footer-section h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+.footer-section p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #ccc;
+}
+
+.footer-section ul {
+    list-style: none;
+}
+
+.footer-section ul li {
+    margin-bottom: 10px;
+}
+
+.footer-section ul li a {
+    color: #ccc;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.footer-section ul li a:hover {
+    color: #007bff;
+}
+
+.footer-section a {
+    color: #ccc;
+    text-decoration: none;
+}
+
+.footer-section a:hover {
+    color: #007bff;
+}
+
+.social-links {
+    display: flex;
+    gap: 15px;
+}
+
+.social-links a {
+    font-size: 1.5rem;
+    color: #ccc;
+    transition: color 0.3s ease;
+}
+
+.social-links a:hover {
+    color: #007bff;
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid #444;
+    margin-top: 20px;
+}
+
+.footer-bottom p {
+    font-size: 0.8rem;
+    color: #ccc;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .nav-links, .search-container {
@@ -299,5 +397,34 @@ body {
 
     .menu-icon {
         display: block;
+    }
+
+    .footer-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .social-links {
+        justify-content: center;
+    }
+
+    .footer-section ul li a,
+    .footer-section p,
+    .footer-section a {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .footer {
+        padding: 30px 15px;
+    }
+
+    .footer-section h3 {
+        font-size: 1.1rem;
+    }
+
+    .section {
+        padding: 20px 10px;
     }
 }

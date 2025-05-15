@@ -4,9 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Upload Turf</title>
-    <link rel="stylesheet" href="{% static 'css/form.css' %}">
+    <link rel="stylesheet" href="{% static 'css/adminupload.css' %}">
 </head>
 <body>
+    <nav>
+        <a href="{% url 'admin_index' %}" class="nav-link">Back to Admin Dashboard</a>
+    </nav>
     <h2>Upload Turf</h2>
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}

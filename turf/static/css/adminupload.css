@@ -1,3 +1,5 @@
+/* adminupload.css */
+
 /* General Reset and Body Styling */
 * {
     margin: 0;
@@ -8,20 +10,27 @@
 body {
     font-family: 'Arial', sans-serif;
     background-color: #f4f7fa;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     min-height: 100vh;
     padding: 20px;
 }
 
-/* Navigation Bar Styling */
+/* Navigation Styling */
 nav {
     width: 100%;
-    background-color: #ffffff;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
     margin-bottom: 20px;
+    background-color: #ffffff;
     padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: left;
 }
 
-nav a {
+/* Nav Link Styling */
+.nav-link {
     display: inline-block;
     padding: 10px 20px;
     background-color: #6c757d;
@@ -33,79 +42,88 @@ nav a {
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-nav a:hover {
+.nav-link:hover {
     background-color: #5a6268;
-    transform: translate;
+    transform: translateY(-2px);
 }
 
-nav a:active {
+.nav-link:active {
     transform: translateY(0);
-}
-
-/* Form Container Styling */
-form {
-    max-width: 600px;
-    margin: 0 auto;
-    background-color: #ffffff;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Heading Styling */
 h2 {
     color: #333;
+    margin-bottom: 20px;
     font-size: 2rem;
     text-align: center;
-    margin-bottom: 20px;
 }
 
-/* Form Elements Styling */
+/* Form Container Styling */
+form {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+}
+
+/* Form Labels */
 label {
     display: block;
     font-weight: bold;
-    color: #333;
+    color: #555;
     margin-bottom: 8px;
     font-size: 1rem;
 }
 
+/* Form Inputs and Select */
 input[type="text"],
-input[type="time"],
 input[type="number"],
 input[type="file"],
 select {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     margin-bottom: 20px;
     border: 1px solid #ddd;
     border-radius: 5px;
     font-size: 1rem;
     color: #333;
     background-color: #f9f9f9;
-    transition: border-color 0.3s ease;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
 }
 
 input[type="text"]:focus,
-input[type="time"]:focus,
 input[type="number"]:focus,
-input[type="file"]:focus,
 select:focus {
     border-color: #007bff;
+    background-color: #fff;
     outline: none;
+}
+
+/* Placeholder Styling */
+input::placeholder {
+    color: #aaa;
+}
+
+/* File Input Styling */
+input[type="file"] {
+    padding: 10px 12px;
     background-color: #fff;
 }
 
+/* Select Dropdown Styling */
 select {
     appearance: none;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="6"><path fill="%23333" d="M0 0h12L6 6z"/></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
     background-repeat: no-repeat;
     background-position: right 10px center;
-    padding-right: 30px;
+    cursor: pointer;
 }
 
-/* Button Styling */
+/* Submit Button Styling */
 button[type="submit"] {
-    display: block;
     width: 100%;
     padding: 12px;
     background-color: #007bff;
@@ -127,31 +145,12 @@ button[type="submit"]:active {
     transform: translateY(0);
 }
 
-/* Cancel Link Styling */
-a[href="{% url 'admin_index' %}"] {
-    display: block;
-    text-align: center;
-    margin-top: 20px;
-    color: #6c757d;
-    text-decoration: none;
-    font-size: 1rem;
-    font-weight: bold;
-    transition: color 0.3s ease;
-}
-
-a[href="{% url 'admin_index' %}"]:hover {
-    color: #5a6268;
-}
-
-/* Image Preview Styling */
-img {
-    margin-top: 10px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (max-width: 600px) {
+    nav {
+        padding: 10px;
+    }
+
     form {
         padding: 20px;
     }
@@ -160,30 +159,17 @@ img {
         font-size: 1.5rem;
     }
 
-    nav {
-        padding: 10px;
-    }
-
-    nav a {
+    .nav-link {
         font-size: 0.9rem;
         padding: 8px 16px;
     }
 
+    input[type="text"],
+    input[type="number"],
+    input[type="file"],
+    select,
     button[type="submit"] {
-        font-size: 1rem;
-    }
-}
-
-@media (max-width: 600px) {
-    form {
-        padding: 15px;
-    }
-
-    label, input, select, button {
         font-size: 0.9rem;
-    }
-
-    img {
-        width: 80px;
+        padding: 10px;
     }
 }

@@ -3,10 +3,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Turf</title>
-    <link rel="stylesheet" href="{% static 'css/form.css' %}">
+    <link rel="stylesheet" href="{% static 'css/edit_turf.css' %}">
 </head>
 <body>
+    <nav>
+        <a href="{% url 'admin_index' %}">Back to Admin Dashboard</a>
+    </nav>
     <h2>Edit Turf</h2>
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
