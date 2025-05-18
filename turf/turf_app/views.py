@@ -180,25 +180,34 @@ def admin_index(request):
     }
     return render(request, 'adminindex.html', context)
 
+@login_required
+@user_passes_test(lambda u: u.is_staff or u.is_superuser)
 def admin_upload(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         location = request.POST.get('location')
-        sport_type = request.POST.get('sport_type')
+        sport_types = request.POST.get('sport_types')
         open_time = request.POST.get('open_time')
         close_time = request.POST.get('close_time')
-        price = request.POST.get('price')  # New price field
+        price = request.POST.get('price')
         image = request.FILES.get('image')
 
+        # Validate required fields
+        if not all([name, location, sport_types, open_time, close_time, price, image]):
+            messages.error(request, "All fields are required.")
+            return redirect('admin_upload')
+
+        # Validate time format
         try:
             open_time_24hr = datetime.strptime(open_time, "%I:%M %p").strftime("%H:%M")
             close_time_24hr = datetime.strptime(close_time, "%I:%M %p").strftime("%H:%M")
-        except ValueError:
-            messages.error(request, "Invalid time format. Please use HH:MM AM/PM.")
+        except (ValueError, TypeError):
+            messages.error(request, "Invalid time format. Please use HH:MM AM/PM (e.g., 06:00 AM).")
             return redirect('admin_upload')
 
+        # Validate price
         try:
-            price = float(price)  # Convert price to float
+            price = float(price)
             if price < 0:
                 messages.error(request, "Price cannot be negative.")
                 return redirect('admin_upload')
@@ -206,20 +215,20 @@ def admin_upload(request):
             messages.error(request, "Invalid price format. Please enter a valid number.")
             return redirect('admin_upload')
 
+        # Save turf
         Turf.objects.create(
             name=name,
             location=location,
-            sport_types=sport_type,
+            sport_types=sport_types,
             open_time=open_time_24hr,
             close_time=close_time_24hr,
-            price=price,  # Save price
+            price=price,
             images=image
         )
         messages.success(request, "Turf uploaded successfully.")
         return redirect('admin_index')
 
     return render(request, 'adminupload.html')
-
 def home(request):
     turfs = Turf.objects.all()
     return render(request, 'home.html', {'turfs': turfs})
@@ -397,7 +406,7 @@ def edit_turf(request, turf_id):
         # Retrieve form data
         turf.name = request.POST.get('name')
         turf.location = request.POST.get('location')
-        turf.sport_types = request.POST.get('sport_type')
+        turf.sport_types = request.POST.get('sport_types')
         open_time = request.POST.get('open_time')
         close_time = request.POST.get('close_time')
         price = request.POST.get('price')  # New price field

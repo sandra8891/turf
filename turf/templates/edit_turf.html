@@ -22,7 +22,7 @@
         <input type="text" name="location" value="{{ turf.location }}" required><br>
 
         <label>Sport Type:</label>
-        <select name="sport_type" required>
+        <select name="sport_types" required>
             <option value="Football" {% if turf.sport_types == 'Football' %}selected{% endif %}>Football</option>
             <option value="Cricket" {% if turf.sport_types == 'Cricket' %}selected{% endif %}>Cricket</option>
         </select><br>

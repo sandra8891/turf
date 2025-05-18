@@ -11,34 +11,44 @@
         <a href="{% url 'admin_index' %}" class="nav-link">Back to Admin Dashboard</a>
     </nav>
     <h2>Upload Turf</h2>
-    <form method="POST" enctype="multipart/form-data">
+    {% if messages %}
+        {% for message in messages %}
+            <p class="{{ message.tags }}">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    <form method="POST" action="{% url 'admin_upload' %}" enctype="multipart/form-data">
         {% csrf_token %}
-        
-        <label>Name:</label>
-        <input type="text" name="name" required><br>
-
-        <label>Location:</label>
-        <input type="text" name="location" required><br>
-
-        <label>Sport Type:</label>
-        <select name="sport_type" required>
-            <option value="Football">Football</option>
-            <option value="Cricket">Cricket</option>
-        </select><br>
-        
-        <label>Open Time:</label>
-        <input type="text" name="open_time" placeholder="06:00 AM" required><br>
-        
-        <label>Close Time:</label>
-        <input type="text" name="close_time" placeholder="06:00 PM" required><br>
-
-        <label>Price per Hour (USD):</label>
-        <input type="number" name="price" step="0.01" min="0" placeholder="50.00" required><br>
-        
-        
-        <label>Image:</label>
-        <input type="file" name="image" required><br>
-        
+        <div>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div>
+            <label for="location">Location:</label>
+            <input type="text" id="location" name="location" required>
+        </div>
+        <div>
+            <label for="sport_types">Sport Type:</label>
+            <select id="sport_types" name="sport_types" required>
+                <option value="Football">Football</option>
+                <option value="Cricket">Cricket</option>
+            </select>
+        </div>
+        <div>
+            <label for="open_time">Open Time:</label>
+            <input type="text" id="open_time" name="open_time" placeholder="06:00 AM" pattern="^(0?[1-9]|1[0-2]):[0-5][0-9] (AM|PM)$" title="Enter time in HH:MM AM/PM format (e.g., 06:00 AM)" required>
+        </div>
+        <div>
+            <label for="close_time">Close Time:</label>
+            <input type="text" id="close_time" name="close_time" placeholder="06:00 PM" pattern="^(0?[1-9]|1[0-2]):[0-5][0-9] (AM|PM)$" title="Enter time in HH:MM AM/PM format (e.g., 06:00 PM)" required>
+        </div>
+        <div>
+            <label for="price">Price per Hour (USD):</label>
+            <input type="number" id="price" name="price" step="0.01" min="0" placeholder="50.00" required>
+        </div>
+        <div>
+            <label for="image">Image:</label>
+            <input type="file" id="image" name="image" accept="image/*" required>
+        </div>
         <button type="submit">Upload</button>
     </form>
 </body>
