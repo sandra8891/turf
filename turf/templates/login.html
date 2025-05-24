@@ -4,12 +4,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'css/login.css' %}"/>
     <title>Login</title>
+    <style>
+        /* Reset default styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Verdana', sans-serif;
+        }
+
+        /* Body with light football field background */
+        body {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); /* Light grayish-green gradient */
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle crowd roar glow */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+            z-index: 1;
+            animation: roarGlow 7s ease-in-out infinite;
+        }
+
+        /* Penalty shootout football */
+        .penalty-ball {
+            position: absolute;
+            bottom: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            background: url('https://via.placeholder.com/50?text=⚽') no-repeat center; /* Replace with football image */
+            background-size: contain;
+            z-index: 2;
+            animation: shootBall 7s ease-in-out infinite;
+        }
+
+        /* Ball trail effect */
+        .trail {
+            position: absolute;
+            bottom: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 10px;
+            background: linear-gradient(to right, rgba(33, 33, 33, 0.3), transparent); /* Darker trail for contrast */
+            z-index: 1;
+            animation: trailFade 7s ease-in-out infinite;
+        }
+
+        /* Keyframes for crowd roar glow */
+        @keyframes roarGlow {
+            0%, 100% { opacity: 0.2; }
+            30% { opacity: 0.3; } /* Peaks during shot */
+            35%, 100% { opacity: 0.2; }
+        }
+
+        /* Keyframes for penalty ball shot */
+        @keyframes shootBall {
+            0% { transform: translateX(-50%) scale(1); opacity: 1; }
+            30% { transform: translateX(-50%) scale(1.2); opacity: 1; } /* Ball prepares for shot */
+            40% { transform: translate(60vw, -30vh) scale(0.8); opacity: 1; } /* Shoots toward goal */
+            45%, 100% { transform: translate(60vw, -30vh); opacity: 0; } /* Fades out */
+        }
+
+        /* Keyframes for ball trail */
+        @keyframes trailFade {
+            0%, 30% { opacity: 0; }
+            35% { opacity: 0.3; width: 150px; }
+            45%, 100% { opacity: 0; width: 150px; }
+        }
+
+        /* Login container */
+        .login-container {
+            display: flex;
+            width: 800px;
+            height: 450px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            z-index: 3;
+        }
+
+        /* Left panel styling */
+        .left-panel {
+            flex: 1;
+            background: linear-gradient(135deg, #004d40, #26a69a);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .logo h2 {
+            font-size: 2.8em;
+            font-weight: bold;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .logo .highlight {
+            color: #ffeb3b; /* Brighter yellow for 'P' */
+        }
+
+        .logo p {
+            font-size: 1.1em;
+            margin-top: 12px;
+            opacity: 0.9;
+        }
+
+        /* Right panel styling */
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 30px;
+            background: #fafafa;
+        }
+
+        .right-panel h1 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: #222;
+        }
+
+        .right-panel form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .right-panel input[type="text"],
+        .right-panel input[type="password"] {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .right-panel input[type="text"]:focus,
+        .right-panel input[type="password"]:focus {
+            border-color: #26a69a;
+            box-shadow: 0 0 5px rgba(38, 166, 154, 0.5);
+        }
+
+        .right-panel input[type="submit"] {
+            padding: 12px;
+            background: #26a69a;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .right-panel input[type="submit"]:hover {
+            background: #00897b;
+            transform: translateY(-2px);
+        }
+
+        .bottom-links {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        .bottom-links a {
+            color: #26a69a;
+            text-decoration: none;
+            margin: 0 8px;
+        }
+
+        .bottom-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+                width: 95%;
+                height: auto;
+            }
+
+            .left-panel, .right-panel {
+                flex: none;
+                width: 100%;
+                padding: 15px;
+            }
+
+            .logo h2 {
+                font-size: 2em;
+            }
+
+            .penalty-ball {
+                width: 35px;
+                height: 35px;
+                bottom: 7%;
+            }
+
+            .trail {
+                bottom: 7%;
+                width: 80px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="login-container">
-
         <!-- Left image section -->
         <div class="left-panel">
             <div class="logo">
@@ -49,5 +271,7 @@
             </div>
         </div>
     </div>
+    <div class="trail"></div>
+    <div class="penalty-ball"></div>
 </body>
 </html>

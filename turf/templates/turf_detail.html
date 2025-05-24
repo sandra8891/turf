@@ -9,50 +9,55 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/bootstrap-icons/bootstrap-icons.min.css' %}" onerror="this.href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css';">
     <style>
-        .turf-image-carousel {
-            position: relative;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .carousel-container {
-            overflow: hidden;
-            width: 100%;
-        }
-        .carousel-slides {
-            display: flex;
-            transition: transform 0.5s ease-in-out;
-        }
-        .carousel-slide {
-            min-width: 100%;
-            box-sizing: border-box;
-        }
-        .carousel-slide img {
-            width: 100%;
-            height: auto;
-            border-radius: 8px;
-        }
-        .carousel-button {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-            font-size: 18px;
-        }
-        .prev {
-            left: 10px;
-        }
-        .next {
-            right: 10px;
-        }
-        .carousel-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-    </style>
+    .turf-image-carousel {
+        position: relative;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    .carousel-container {
+        overflow: hidden;
+        width: 100%;
+        aspect-ratio: 16 / 9; /* Maintain a consistent aspect ratio for the carousel */
+    }
+    .carousel-slides {
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+    }
+    .carousel-slide {
+        min-width: 100%;
+        box-sizing: border-box;
+        display: flex; /* Ensure images are centered */
+        justify-content: center;
+        align-items: center;
+    }
+    .carousel-slide img {
+        width: 100%;
+        height: 300px; /* Set a fixed height for all images */
+        object-fit: cover; /* Ensures images cover the area without distortion */
+        border-radius: 8px;
+    }
+    .carousel-button {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        font-size: 18px;
+    }
+    .prev {
+        left: 10px;
+    }
+    .next {
+        right: 10px;
+    }
+    .carousel-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+</style>
 </head>
 <body>
     <!-- Navigation bar -->
