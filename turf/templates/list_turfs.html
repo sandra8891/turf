@@ -43,25 +43,30 @@
     </header>
 
     <!-- Content Section -->
-    <section class="section">
-        <h2>Available Turfs</h2>
-        <div class="turf-grid">
-            {% for turf in turfs %}
-                <div class="turf-card">
-                    <a href="{% url 'turf_detail' turf.id %}">
-                        <div class="turf-image">
-                            <img src="{{ turf.images.url }}" alt="{{ turf.name }}">
-                        </div>
-                        <div class="turf-info">
-                            <h3>{{ turf.name }}</h3>
-                            <p>{{ turf.location }}</p>
-                        </div>
-                    </a>
-                </div>
-            {% endfor %}
-        </div>
-    </section>
-
+<section class="section">
+    <h2>Available Turfs</h2>
+    <div class="turf-grid">
+        {% for turf in turfs %}
+            <div class="turf-card">
+                <a href="{% url 'turf_detail' turf.id %}">
+                    <div class="turf-image">
+                        {% with first_image=turf.images.first %}
+                            {% if first_image %}
+                                <img src="{{ first_image.image.url }}" alt="{{ turf.name }}">
+                            {% else %}
+                                <img src="{% static 'images/default_turf.jpg' %}" alt="Default Turf Image">
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                    <div class="turf-info">
+                        <h3>{{ turf.name }}</h3>
+                        <p>{{ turf.location }}</p>
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</section>
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-container">

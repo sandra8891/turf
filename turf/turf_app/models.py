@@ -13,7 +13,6 @@ class PaymentStatus:
 class Turf(models.Model):
     name = models.CharField(max_length=255)
     location = models.CharField(max_length=255)
-    images = models.ImageField(upload_to='turf_images/')
     sport_types = models.CharField(max_length=100, choices=[('Football', 'Football'), ('Cricket', 'Cricket')])
     open_time = models.TimeField()
     close_time = models.TimeField()
@@ -21,6 +20,16 @@ class Turf(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class TurfImage(models.Model):
+    turf = models.ForeignKey(Turf, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='turf_images/')
+
+    def __str__(self):
+        return f"Image for {self.turf.name}"
+
+
 
 class Slot(models.Model):
     turf = models.ForeignKey(Turf, on_delete=models.CASCADE)

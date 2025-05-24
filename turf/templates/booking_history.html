@@ -3,15 +3,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Booking History</title>
-    <link rel="stylesheet" href="{% static 'css/recent_bookings.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bookinghistory.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
         <nav class="navbar">
-            <a href="{% url 'home' %}">Home</a>
-            <a href="{% url 'profile' %}">Profile</a>
-            <a href="{% url 'logoutuser' %}">Logout</a>
+            <h2 class="logo"><span class="highlight">P</span>LAYSPOTS</h2>
+            <div class="nav-links">
+                <a href="{% url 'home' %}">Home</a>
+                <a href="{% url 'profile' %}">Profile</a>
+                <a href="{% url 'logoutuser' %}">Logout</a>
+            </div>
         </nav>
     </header>
 
@@ -39,18 +44,29 @@
                 <tbody>
                     {% for booking in bookings %}
                         <tr>
-                            <td>{{ booking.slot.turf.name }}</td>
+                            <td>
+                                <div class="turf-details">
+                                    {% with first_image=booking.slot.turf.images.first %}
+                                        {% if first_image %}
+                                            <img src="{{ first_image.image.url }}" alt="{{ booking.slot.turf.name }}" class="turf-image">
+                                        {% else %}
+                                            <img src="{% static 'images/default_turf.jpg' %}" alt="Default Turf Image" class="turf-image">
+                                        {% endif %}
+                                    {% endwith %}
+                                    <span class="turf-name">{{ booking.slot.turf.name }}</span>
+                                </div>
+                            </td>
                             <td>{{ booking.slot.date|date:"F d, Y" }}</td>
                             <td>{{ booking.slot.start_time|time:"h:i A" }} - {{ booking.slot.end_time|time:"h:i A" }}</td>
                             <td>{{ booking.sport }}</td>
                             <td>₹{{ booking.total_amount|floatformat:2 }}</td>
-                            <td>{{ booking.status }}</td>
+                            <td class="status {{ booking.status|lower }}">{{ booking.status }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         {% else %}
-            <p>You have no bookings yet.</p>
+            <p class="no-bookings">You have no bookings yet.</p>
         {% endif %}
     </div>
 </body>

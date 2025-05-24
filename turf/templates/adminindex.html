@@ -48,17 +48,6 @@
                 <div class="header-left">
                     <h1>Admin Dashboard</h1>
                 </div>
-                <!-- <div class="header-right"> -->
-                    <!-- <div class="search-bar">
-                        <input type="text" placeholder="Type to search...">
-                        <i class="bi bi-search"></i>
-                    </div> -->
-                    <!-- <div class="user-profile">
-                        <img src="{% static 'images/default_avatar.png' %}" alt="Admin Avatar" class="avatar">
-                        <span>Admin</span>
-                        <i class="bi bi-chevron-down"></i>
-                    </div> -->
-                <!-- </div> -->
             </header>
 
             <!-- Dashboard Content -->
@@ -68,22 +57,11 @@
                     <div class="card">
                         <h3>Total Turfs</h3>
                         <p>{{ turfs|length }}</p>
-                        <!-- <span class="trend up">+5% <i class="bi bi-arrow-up"></i></span> -->
                     </div>
-                    <!-- <div class="card"> -->
-                        <!-- <h3>Total Bookings</h3> -->
-                        <!-- <p>{{ bookings|length }}</p> -->
-                        <!-- <span class="trend down">+10% <i class="bi bi-arrow-down"></i></span> -->
-                    <!-- </div> -->
                     <div class="card">
                         <h3>Recent Bookings (7 Days)</h3>
                         <p>{{ recent_bookings_count }}</p>
                     </div>
-                    <!-- <div class="card">
-                        <h3>Active Users</h3>
-                        <p>{{ active_users }}</p> -->
-                        <!-- <span class="trend up">+2.5% <i class="bi bi-arrow-up"></i></span> -->
-                    <!-- </div> -->
                 </div>
 
                 <!-- Uploaded Turfs Table -->
@@ -110,11 +88,13 @@
                                 <td>{{ turf.open_time|time:"h:i A" }}</td>
                                 <td>{{ turf.close_time|time:"h:i A" }}</td>
                                 <td>
-                                    {% if turf.images %}
-                                        <img src="{{ turf.images.url }}" alt="Turf Image">
-                                    {% else %}
-                                        No Image
-                                    {% endif %}
+                                    {% with first_image=turf.images.first %}
+                                        {% if first_image %}
+                                            <img src="{{ first_image.image.url }}" alt="{{ turf.name }} Image" width="100">
+                                        {% else %}
+                                            No Image
+                                        {% endif %}
+                                    {% endwith %}
                                 </td>
                                 <td>
                                     <a href="{% url 'edit_turf' turf.id %}" class="btn btn-edit">Edit</a>

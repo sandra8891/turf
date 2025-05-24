@@ -16,7 +16,6 @@
             <h2><span class="highlight">P</span>LAYSPOTS</h2>
             <div class="nav-links">
                 <a href="{% url 'home' %}">Home</a>
-                <!-- <a href="">Contact</a> -->
                 <div class="dropdown">
                     <a href="{% url 'profile' %}" class="dropdown-toggle">My Profile</a>
                     <div class="dropdown-menu">
@@ -72,7 +71,13 @@
                     <div class="turf-card">
                         <a href="{% url 'turf_detail' turf.id %}">
                             <div class="turf-image">
-                                <img src="{{ turf.images.url }}" alt="{{ turf.name }}">
+                                {% with first_image=turf.images.first %}
+                                    {% if first_image %}
+                                        <img src="{{ first_image.image.url }}" alt="{{ turf.name }}">
+                                    {% else %}
+                                        <img src="{% static 'images/default_turf.jpg' %}" alt="Default Turf Image">
+                                    {% endif %}
+                                {% endwith %}
                             </div>
                             <div class="turf-info">
                                 <h3>{{ turf.name }}</h3>

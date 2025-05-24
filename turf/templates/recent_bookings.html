@@ -30,14 +30,14 @@
                     </div>
                 {% endif %}
             </div>
-            <div class="search-container">
+            <!-- <div class="search-container">
                 <form action="{% url 'search_turfs' %}" method="get">
                     <input type="text" name="q" placeholder="Search by turf name or location..." value="{{ query|default:'' }}">
                     <button type="submit"><i class="bi bi-search"></i> <span class="sr-only">Search</span></button>
                 </form>
             </div>
             <a href="{% url 'list_turfs' %}" class="book-button">Book Your Spot</a>
-            <i class="bi bi-list menu-icon"></i>
+            <i class="bi bi-list menu-icon"></i> -->
         </nav>
     </header><br><br>
 
@@ -79,11 +79,13 @@
                                     <span>Location: {{ booking.slot.turf.location }}</span><br>
                                     <span>Sport: {{ booking.slot.turf.sport_types }}</span><br>
                                     <span>Hours: {{ booking.slot.turf.open_time|time:"h:i A" }} - {{ booking.slot.turf.close_time|time:"h:i A" }}</span>
-                                    {% if booking.slot.turf.images %}
-                                        <br><img src="{{ booking.slot.turf.images.url }}" alt="Turf Image" style="max-width: 100px; height: auto;">
-                                    {% else %}
-                                        <br><span>No Image</span>
-                                    {% endif %}
+                                    {% with first_image=booking.slot.turf.images.first %}
+                                        {% if first_image %}
+                                            <br><img src="{{ first_image.image.url }}" alt="Turf Image" class="turf-image">
+                                        {% else %}
+                                            <br><img src="{% static 'images/default_turf.jpg' %}" alt="Default Turf Image" class="turf-image">
+                                        {% endif %}
+                                    {% endwith %}
                                 </td>
                             {% else %}
                                 <td>{{ booking.slot.turf.name }}</td>
@@ -105,41 +107,7 @@
         {% endif %}
     </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-section">
-                <h3>PlaySpots</h3>
-                <p>Book the best football turf grounds in Kochi with ease.</p>
-            </div>
-            <div class="footer-section">
-                <h3>Quick Links</h3>
-                <ul>
-                    <li><a href="{% url 'home' %}">Home</a></li>
-                    <li><a href="{% url 'profile' %}">Profile</a></li>
-                    <li><a href="{% url 'recent_bookings' %}">Booking History</a></li>
-                    <li><a href="{% url 'logoutuser' %}">Logout</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h3>Contact Us</h3>
-                <p>Email: <a href="mailto:support@playspots.com">support@playspots.com</a></p>
-                <p>Phone: <a href="tel:+919876543210">+91 98765 43210</a></p>
-            </div>
-            <div class="footer-section">
-                <h3>Follow Us</h3>
-                <div class="social-links">
-                    <a href="https://x.com/playspots" target="_blank" aria-label="Twitter/X"><i class="bi bi-twitter-x"></i></a>
-                    <a href="https://instagram.com/playspots" target="_blank" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
-                    <a href="https://facebook.com/playspots" target="_blank" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
-                </div>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>© <span id="year"></span> PlaySpots. All rights reserved.</p>
-        </div>
-    </footer>
-
+    
     <!-- JavaScript for dynamic year -->
     <script>
         document.getElementById('year').textContent = new Date().getFullYear();

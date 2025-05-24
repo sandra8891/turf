@@ -46,8 +46,9 @@
             <input type="number" id="price" name="price" step="0.01" min="0" placeholder="50.00" required>
         </div>
         <div>
-            <label for="image">Image:</label>
-            <input type="file" id="image" name="image" accept="image/*" required>
+            <label for="images">Images (up to 5):</label>
+            <input type="file" id="images" name="images" accept="image/*" multiple required>
+            <p class="help-text">Select up to 5 images for the turf.</p>
         </div>
         <button type="submit">Upload</button>
     </form>

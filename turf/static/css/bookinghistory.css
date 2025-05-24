@@ -1,0 +1,279 @@
+/* General Styles */
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background-color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar .logo {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.navbar .highlight {
+    color: #07c965; /* Green accent */
+}
+
+.nav-links {
+    display: flex;
+    gap: 25px;
+    align-items: center;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: #07c965;
+}
+
+/* Bookings Container */
+.bookings-container {
+    max-width: 1100px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.bookings-container h2 {
+    color: #07c965;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* Messages */
+.messages {
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.message {
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    margin: 5px 0;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.message.success {
+    background-color: #e6f4ea;
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+}
+
+.message.error {
+    background-color: #ffebee;
+    color: #d32f2f;
+    border: 1px solid #ef9a9a;
+}
+
+.message.info {
+    background-color: #e0f7fa;
+    color: #0277bd;
+    border: 1px solid #81d4fa;
+}
+
+/* Table Styles */
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+thead {
+    background-color: #07c965;
+    color: #fff;
+}
+
+th {
+    padding: 15px 20px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.3px;
+}
+
+tbody tr {
+    border-bottom: 1px solid #e9ecef;
+    transition: background-color 0.3s ease;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+tbody tr:hover {
+    background-color: #f1f3f5;
+}
+
+td {
+    padding: 15px 20px;
+    font-size: 0.95rem;
+    color: #333;
+    vertical-align: middle;
+}
+
+/* Turf Column with Image */
+.turf-details {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.turf-image {
+    width: 100px; /* Small size as requested */
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    transition: transform 0.3s ease;
+}
+
+.turf-image:hover {
+    transform: scale(1.05);
+}
+
+.turf-name {
+    font-weight: 500;
+    color: #333;
+}
+
+/* Status Styling */
+.status {
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 12px;
+    display: inline-block;
+    font-size: 0.9rem;
+}
+
+.status.confirmed {
+    background-color: #e6f4ea;
+    color: #2e7d32;
+}
+
+.status.cancelled {
+    background-color: #ffebee;
+    color: #d32f2f;
+}
+
+.status.pending {
+    background-color: #fff3e0;
+    color: #f57c00;
+}
+
+/* No Bookings Message */
+.no-bookings {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #666;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 15px 20px;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 15px;
+        width: 100%;
+        text-align: center;
+    }
+
+    .nav-links a {
+        font-size: 0.95rem;
+        padding: 5px 0;
+    }
+
+    .bookings-container {
+        margin: 30px auto;
+        padding: 15px;
+    }
+
+    table {
+        font-size: 0.9rem;
+    }
+
+    th, td {
+        padding: 12px 15px;
+    }
+
+    .turf-details {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .turf-image {
+        width: 80px;
+        height: 64px;
+    }
+}
+
+@media (max-width: 600px) {
+    .bookings-container h2 {
+        font-size: 1.6rem;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    th, td {
+        font-size: 0.85rem;
+        padding: 10px;
+    }
+
+    .turf-image {
+        width: 70px;
+        height: 56px;
+    }
+
+    .status {
+        font-size: 0.85rem;
+        padding: 4px 8px;
+    }
+}

@@ -8,6 +8,51 @@
     <link rel="stylesheet" href="{% static 'css/turf_details.css' %}?v=1">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/bootstrap-icons/bootstrap-icons.min.css' %}" onerror="this.href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css';">
+    <style>
+        .turf-image-carousel {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .carousel-container {
+            overflow: hidden;
+            width: 100%;
+        }
+        .carousel-slides {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+        .carousel-slide {
+            min-width: 100%;
+            box-sizing: border-box;
+        }
+        .carousel-slide img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .carousel-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        .prev {
+            left: 10px;
+        }
+        .next {
+            right: 10px;
+        }
+        .carousel-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation bar -->
@@ -16,7 +61,6 @@
             <img src="{% static 'images/logo.png' %}" alt="PlaySpots Logo" class="logo">
             <div class="nav-links">
                 <a href="{% url 'home' %}">Home</a>
-                <!-- <a href="">Contact</a> -->
                 {% if user.is_authenticated %}
                     <div class="dropdown">
                         <a href="{% url 'profile' %}" class="dropdown-toggle">My Profile</a>
@@ -45,8 +89,23 @@
     <!-- Turf Details -->
     <div class="turf-details">
         <h1>{{ turf.name }}</h1>
-        <div class="turf-image">
-            <img src="{{ turf.images.url }}" alt="{{ turf.name }}" width="400">
+        <div class="turf-image-carousel">
+            {% if images %}
+                <!-- <p>Number of images: {{ images|length }}</p>  -->
+                <div class="carousel-container">
+                    <div class="carousel-slides">
+                        {% for image in images %}
+                            <div class="carousel-slide">
+                                <img src="{{ image.image.url }}" alt="{{ turf.name }} Image">
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <button class="carousel-button prev" id="prevBtn" disabled>❮</button>
+                <button class="carousel-button next" id="nextBtn">❯</button>
+            {% else %}
+                <p>No images available for this turf.</p>
+            {% endif %}
         </div>
         <div class="turf-info">
             <p><strong>Location:</strong> {{ turf.location }}</p>
@@ -94,9 +153,39 @@
         </div>
     </footer>
 
-    <!-- JavaScript for dynamic year -->
+    <!-- JavaScript for carousel -->
     <script>
         document.getElementById('year').textContent = new Date().getFullYear();
+
+        const slides = document.querySelector('.carousel-slides');
+        const slideCount = document.querySelectorAll('.carousel-slide').length;
+        const prevBtn = document.querySelector('#prevBtn');
+        const nextBtn = document.querySelector('#nextBtn');
+        let currentIndex = 0;
+
+        // Initial button state
+        updateButtonStates();
+
+        prevBtn.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                slides.style.transform = `translateX(-${currentIndex * 100}%)`;
+                updateButtonStates();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentIndex < slideCount - 1) {
+                currentIndex++;
+                slides.style.transform = `translateX(-${currentIndex * 100}%)`;
+                updateButtonStates();
+            }
+        });
+
+        function updateButtonStates() {
+            prevBtn.disabled = currentIndex === 0;
+            nextBtn.disabled = currentIndex === slideCount - 1;
+        }
     </script>
 </body>
 </html>

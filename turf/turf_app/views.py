@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.core.mail import send_mail
 import razorpay
 from datetime import datetime, timedelta, time
-from .models import Turf, Slot, Booking,PaymentStatus
+from .models import Turf, Slot, Booking,PaymentStatus,TurfImage
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils import timezone
 
@@ -190,11 +190,19 @@ def admin_upload(request):
         open_time = request.POST.get('open_time')
         close_time = request.POST.get('close_time')
         price = request.POST.get('price')
-        image = request.FILES.get('image')
+        images = request.FILES.getlist('images')  # Get list of uploaded images
 
         # Validate required fields
-        if not all([name, location, sport_types, open_time, close_time, price, image]):
+        if not all([name, location, sport_types, open_time, close_time, price]):
             messages.error(request, "All fields are required.")
+            return redirect('admin_upload')
+
+        # Validate number of images
+        if not images:
+            messages.error(request, "At least one image is required.")
+            return redirect('admin_upload')
+        if len(images) > 5:
+            messages.error(request, "You can upload a maximum of 5 images.")
             return redirect('admin_upload')
 
         # Validate time format
@@ -216,16 +224,24 @@ def admin_upload(request):
             return redirect('admin_upload')
 
         # Save turf
-        Turf.objects.create(
+        turf = Turf.objects.create(
             name=name,
             location=location,
             sport_types=sport_types,
             open_time=open_time_24hr,
             close_time=close_time_24hr,
-            price=price,
-            images=image
+            price=price
         )
-        messages.success(request, "Turf uploaded successfully.")
+
+        # Save images with additional logging
+        for image in images:
+            if image.content_type.startswith('image'):
+                TurfImage.objects.create(turf=turf, image=image)
+                print(f"Saved image: {image.name} for turf {turf.name} (ID: {turf.id})")
+            else:
+                messages.warning(request, f"Skipped {image.name}: Not a valid image file.")
+
+        messages.success(request, "Turf uploaded successfully with images.")
         return redirect('admin_index')
 
     return render(request, 'adminupload.html')
@@ -235,7 +251,8 @@ def home(request):
 
 def turf_detail(request, turf_id):
     turf = get_object_or_404(Turf, pk=turf_id)
-    context = {'turf': turf}
+    images = turf.images.all()  # Get all images for the turf
+    context = {'turf': turf, 'images': images}
     return render(request, 'turf_detail.html', context)
 
 def booking(request, turf_id):
@@ -409,7 +426,8 @@ def edit_turf(request, turf_id):
         turf.sport_types = request.POST.get('sport_types')
         open_time = request.POST.get('open_time')
         close_time = request.POST.get('close_time')
-        price = request.POST.get('price')  # New price field
+        price = request.POST.get('price')
+        images = request.FILES.getlist('images')  # Get list of uploaded images
 
         # Validate required fields
         if not all([turf.name, turf.location, turf.sport_types, open_time, close_time, price]):
@@ -434,9 +452,19 @@ def edit_turf(request, turf_id):
             messages.error(request, "Invalid price format. Please enter a valid number.")
             return render(request, 'edit_turf.html', {'turf': turf})
 
-        # Handle image upload
-        if request.FILES.get('image'):
-            turf.images = request.FILES['image']
+        # Handle image uploads (append new images instead of deleting existing ones)
+        if images:
+            existing_images_count = turf.images.count()
+            new_images_count = len(images)
+            if existing_images_count + new_images_count > 5:
+                messages.error(request, "Total images cannot exceed 5.")
+                return render(request, 'edit_turf.html', {'turf': turf})
+            for image in images:
+                if image.content_type.startswith('image'):
+                    TurfImage.objects.create(turf=turf, image=image)
+                    print(f"Added image: {image.name} to turf {turf.name} (ID: {turf.id})")
+                else:
+                    messages.warning(request, f"Skipped {image.name}: Not a valid image file.")
 
         # Save the updated turf
         try:
@@ -447,7 +475,8 @@ def edit_turf(request, turf_id):
             messages.error(request, f"Error saving turf: {str(e)}")
             return render(request, 'edit_turf.html', {'turf': turf})
 
-    return render(request, 'edit_turf.html', {'turf': turf})
+    images = turf.images.all()  # Pass current images to template
+    return render(request, 'edit_turf.html', {'turf': turf, 'images': images})
 
 @user_passes_test(is_admin)
 def delete_turf(request, turf_id):
